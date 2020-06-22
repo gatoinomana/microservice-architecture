@@ -1,13 +1,15 @@
 package controlador;
 
-import java.util.LinkedList;
+import java.util.List;
 
+import persistencia.Persistencia;
 import tipos.Rol;
 import tipos.Usuario;
 
 public class ControladorUsuarios implements InterfazControladorUsuarios {
 	
 	private static ControladorUsuarios instance;
+	private static Persistencia persistencia = Persistencia.getInstance();
 	
 	public static ControladorUsuarios getInstance() {
 		if (instance == null)
@@ -15,39 +17,18 @@ public class ControladorUsuarios implements InterfazControladorUsuarios {
 		return instance;
 	}
 
-	public String createUsuario(String nombre, String email, Rol rol) throws UsuariosException {
-		// TODO Auto-generated method stub
-		return null;
+	public List<Usuario> getProfesores() throws UsuariosException {
+		return persistencia.readProfesores();
 	}
 
-	public void updateUsuario(String id, String nombre, String email, Rol rol) throws UsuariosException {
-		// TODO Auto-generated method stub
-		
+	public List<Usuario> getEstudiantes() throws UsuariosException {
+		return persistencia.readEstudiantes();
 	}
-
-	public Usuario getUsuario(String id) throws UsuariosException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
+	
 	public Rol getRol(String id) throws UsuariosException {
-		// TODO Auto-generated method stub
-		return null;
+		Usuario u = persistencia.readUsuario(id);
+		return u.getRol();
 	}
 
-	public boolean removeUsuario(String id) throws UsuariosException {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	public LinkedList<Usuario> getProfesores() throws UsuariosException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public LinkedList<Usuario> getEstudiantes() throws UsuariosException {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 }

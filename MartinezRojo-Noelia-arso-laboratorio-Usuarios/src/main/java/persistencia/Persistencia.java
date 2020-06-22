@@ -24,7 +24,7 @@ public class Persistencia implements InterfazPersistencia {
 		return instance;
 	}
 
-	public void writeUsuario(Usuario usuario) throws UsuariosException {
+	public String writeUsuario(Usuario usuario) throws UsuariosException {
 		String id = usuario.getEmail();
 
 		try {
@@ -33,9 +33,11 @@ public class Persistencia implements InterfazPersistencia {
 			marshaller.setProperty("jaxb.formatted.output", true);
 			marshaller.setProperty("jaxb.schemaLocation", "http://www.um.es/autor autor.xsd");
 			marshaller.marshal(usuario, new File("xml/" + id + ".xml"));
+			return id;
 		} catch (JAXBException e) {
 			throw new UsuariosException("Error al persistir usuario", e);
 		}
+		
 	}
 
 	public Usuario readUsuario(String id) throws UsuariosException {
@@ -60,10 +62,14 @@ public class Persistencia implements InterfazPersistencia {
 		return readUsuarios(Rol.ESTUDIANTE);
 	}
 
-	public void removeUsuario(String id) throws UsuariosException {
+	public boolean removeUsuario(String id) throws UsuariosException {
 		File f = new File("xml/", id + ".xml");
-		if (f.exists())
+		if (f.exists()) {
 			f.delete();
+			return true;
+		}
+		else return false;
+			
 	}
 
 	public void removeUsuarios() throws UsuariosException {

@@ -9,9 +9,9 @@ import tipos.Usuario;
 public interface InterfazPersistencia {
 	
 	/** 
-	 * Hacer persistir un usuario
+	 * Hacer persistir un usuario (devuelve id)
 	 */
-	void writeUsuario(Usuario usuario) throws UsuariosException;
+	String writeUsuario(Usuario usuario) throws UsuariosException;
 	
 	/** 
 	 * Cargar de persistencia un usuario dado su id
@@ -31,7 +31,7 @@ public interface InterfazPersistencia {
 	/** 
 	 * Borra de persistencia un usuario dado su id
 	 */
-	void removeUsuario(String id) throws UsuariosException;
+	boolean removeUsuario(String id) throws UsuariosException;
 	
 	/** 
 	 * Borra de persistencia todos los usuarios
