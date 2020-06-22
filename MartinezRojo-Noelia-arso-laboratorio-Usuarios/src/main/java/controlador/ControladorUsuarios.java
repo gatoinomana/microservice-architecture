@@ -1,0 +1,45 @@
+package controlador;
+
+import java.util.LinkedList;
+
+import usuario.Rol;
+import usuario.Usuario;
+
+public class ControladorUsuarios implements InterfazControladorUsuarios {
+
+	public String createUsuario(String nombre, String email, Rol rol) throws UsuariosException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public void updateUsuario(String id, String nombre, String email, Rol rol) throws UsuariosException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public Usuario getUsuario(String id) throws UsuariosException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Rol getRol(String id) throws UsuariosException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public boolean removeUsuario(String id) throws UsuariosException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	public LinkedList<Usuario> getProfesores() throws UsuariosException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public LinkedList<Usuario> getEstudiantes() throws UsuariosException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+}
