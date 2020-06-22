@@ -2,10 +2,18 @@ package controlador;
 
 import java.util.LinkedList;
 
-import usuario.Rol;
-import usuario.Usuario;
+import tipos.Rol;
+import tipos.Usuario;
 
 public class ControladorUsuarios implements InterfazControladorUsuarios {
+	
+	private static ControladorUsuarios instance;
+	
+	public static ControladorUsuarios getInstance() {
+		if (instance == null)
+			instance = new ControladorUsuarios();
+		return instance;
+	}
 
 	public String createUsuario(String nombre, String email, Rol rol) throws UsuariosException {
 		// TODO Auto-generated method stub

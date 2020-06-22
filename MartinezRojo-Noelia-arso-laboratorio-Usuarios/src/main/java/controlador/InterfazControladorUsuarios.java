@@ -1,9 +1,9 @@
 package controlador;
 
-import java.util.LinkedList;
+import java.util.List;
 
-import usuario.Rol;
-import usuario.Usuario;
+import tipos.Rol;
+import tipos.Usuario;
 
 public interface InterfazControladorUsuarios {
 	
@@ -38,10 +38,10 @@ public interface InterfazControladorUsuarios {
 	/**
 	 * Método de consulta de todos los usuarios con rol profesor
 	 */
-	LinkedList<Usuario> getProfesores() throws UsuariosException;
+	List<Usuario> getProfesores() throws UsuariosException;
 	
 	/**
 	 * Método de consulta de todos los usuarios con rol estudiante
 	 */
-	LinkedList<Usuario> getEstudiantes() throws UsuariosException;
+	List<Usuario> getEstudiantes() throws UsuariosException;
 }

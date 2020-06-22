@@ -6,7 +6,7 @@
 //
 
 
-package usuario;
+package tipos;
 
 import javax.xml.bind.annotation.XmlEnum;
 import javax.xml.bind.annotation.XmlEnumValue;

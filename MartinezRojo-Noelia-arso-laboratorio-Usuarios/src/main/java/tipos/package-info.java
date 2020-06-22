@@ -6,4 +6,4 @@
 //
 
 @javax.xml.bind.annotation.XmlSchema(namespace = "http://www.example.org/usuario")
-package usuario;
+package tipos;
