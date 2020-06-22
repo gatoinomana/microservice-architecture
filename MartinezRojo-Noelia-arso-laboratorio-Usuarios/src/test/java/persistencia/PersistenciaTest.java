@@ -43,7 +43,10 @@ class PersistenciaTest {
 	
 	@AfterAll
 	private static void afterAll() throws UsuariosException {
-		persistencia.removeUsuarios();
+		persistencia.removeUsuario(estudiante1.getEmail());
+		persistencia.removeUsuario(estudiante2.getEmail());
+		persistencia.removeUsuario(profesor1.getEmail());
+		persistencia.removeUsuario(profesor2.getEmail());
 	}
 	
 	/** 
@@ -67,7 +70,7 @@ class PersistenciaTest {
 	@Test
 	void readUsuarioTest() throws UsuariosException, IOException  {
 		persistencia.writeUsuario(estudiante1);
-		Usuario u  = persistencia.readUsuario(estudiante1.getEmail());
+		Usuario u = persistencia.readUsuario(estudiante1.getEmail());
 		assertEquals(estudiante1.getNombre(), u.getNombre());
 		assertEquals(estudiante1.getEmail(), u.getEmail());
 		assertEquals(estudiante1.getRol(), u.getRol());

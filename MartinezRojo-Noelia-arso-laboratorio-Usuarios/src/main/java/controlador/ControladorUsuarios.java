@@ -27,8 +27,13 @@ public class ControladorUsuarios implements InterfazControladorUsuarios {
 	
 	public Rol getRol(String id) throws UsuariosException {
 		Usuario u = persistencia.readUsuario(id);
-		return u.getRol();
+		if (u != null)
+			return u.getRol();
+		else return null;
 	}
-
-
+	
+	// TODO: quitar (prueba)
+	public Usuario getUsuario(String id) throws UsuariosException {
+		return persistencia.readUsuario(id);
+	}
 }

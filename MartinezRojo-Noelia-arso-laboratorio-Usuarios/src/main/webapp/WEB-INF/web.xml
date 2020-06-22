@@ -10,7 +10,7 @@
 		<init-param>
 			<param-name>com.sun.jersey.config.property.packages</param-name>
 			<param-value>io.swagger.jaxrs.json,
-                io.swagger.jaxrs.listing, bookle.rest</param-value>
+                io.swagger.jaxrs.listing, rest</param-value>
 		</init-param>
 		<init-param>
 			<param-name>com.sun.jersey.api.json.POJOMappingFeature</param-name>

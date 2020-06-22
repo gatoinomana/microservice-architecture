@@ -31,7 +31,6 @@ public class Persistencia implements InterfazPersistencia {
 			JAXBContext contexto = JAXBContext.newInstance("tipos");
 			Marshaller marshaller = contexto.createMarshaller();
 			marshaller.setProperty("jaxb.formatted.output", true);
-			marshaller.setProperty("jaxb.schemaLocation", "http://www.um.es/autor autor.xsd");
 			marshaller.marshal(usuario, new File("xml/" + id + ".xml"));
 			return id;
 		} catch (JAXBException e) {
@@ -41,9 +40,10 @@ public class Persistencia implements InterfazPersistencia {
 	}
 
 	public Usuario readUsuario(String id) throws UsuariosException {
-		File f = new File("xml/", id + ".xml");
-		if (!f.exists())
+		File f = new File("./xml/" + id + ".xml");
+		if (!f.exists()) {
 			return null;
+		}
 		try {
 			JAXBContext contexto = JAXBContext.newInstance("tipos");
 			Unmarshaller unmarshaller = contexto.createUnmarshaller();

@@ -21,5 +21,8 @@ public interface InterfazControladorUsuarios {
 	 * Método de consulta del rol de un usuario
 	 */
 	Rol getRol(String id) throws UsuariosException;
+	
+	// TODO: quitar (prueba)
+	Usuario getUsuario(String id) throws UsuariosException;
 
 }
