@@ -2,8 +2,8 @@ package controlador;
 
 import java.util.List;
 
-import tipos.Rol;
-import tipos.Usuario;
+import modelo.Rol;
+import modelo.Usuario;
 
 public interface InterfazControladorUsuarios {
 

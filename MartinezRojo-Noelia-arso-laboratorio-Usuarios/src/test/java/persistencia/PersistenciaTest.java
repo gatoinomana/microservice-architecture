@@ -11,8 +11,8 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import controlador.UsuariosException;
-import tipos.Rol;
-import tipos.Usuario;
+import modelo.Rol;
+import modelo.Usuario;
 
 class PersistenciaTest {
 	private static Persistencia persistencia = Persistencia.getInstance();

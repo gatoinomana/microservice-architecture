@@ -6,7 +6,7 @@
 //
 
 
-package tipos;
+package modelo;
 
 import javax.xml.bind.annotation.XmlRegistry;
 

@@ -11,8 +11,8 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
 import controlador.UsuariosException;
-import tipos.Rol;
-import tipos.Usuario;
+import modelo.Rol;
+import modelo.Usuario;
 
 public class Persistencia implements InterfazPersistencia {
 	

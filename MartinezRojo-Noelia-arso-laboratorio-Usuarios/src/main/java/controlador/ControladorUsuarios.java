@@ -3,8 +3,8 @@ package controlador;
 import java.util.List;
 
 import persistencia.Persistencia;
-import tipos.Rol;
-import tipos.Usuario;
+import modelo.Rol;
+import modelo.Usuario;
 
 public class ControladorUsuarios implements InterfazControladorUsuarios {
 	

@@ -3,8 +3,8 @@ package persistencia;
 import java.util.List;
 
 import controlador.UsuariosException;
-import tipos.Rol;
-import tipos.Usuario;
+import modelo.Rol;
+import modelo.Usuario;
 
 public interface InterfazPersistencia {
 	
