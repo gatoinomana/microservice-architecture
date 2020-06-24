@@ -1,15 +1,16 @@
 package persistence;
 
-import java.util.Calendar;
-import java.util.Date;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import org.bson.Document;
+import org.bson.types.ObjectId;
 
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Filters;
 
 import model.Survey;
 import model.Visibility;
@@ -37,7 +38,8 @@ public class SurveyRepository {
         return survey(doc);
     }
     
-    private Survey survey(Document doc) {
+    @SuppressWarnings("unchecked")
+	private Survey survey(Document doc) {
     	List<String> options = (LinkedList<String>) doc.get("options");
     	Map<String, Integer> results = (HashMap<String, Integer>) doc.get("results");
     	Visibility visibility = Visibility.valueOf(doc.getString("visibility"));
@@ -54,16 +56,16 @@ public class SurveyRepository {
         );
     }
 
-//     public Survey findById(String id) {
-//        Document doc = links.find(Filters.eq("_id", new ObjectId(id))).first();
-//        return link(doc);
-//    }
-//    
-//    public List<Survey> getAllSurveys() {
-//        List<Link> allLinks = new ArrayList<>();
-//        for (Document doc : links.find()) {
-//            allLinks.add(link(doc));
-//        }
-//        return allLinks;
-//    }
+     public Survey findById(String id) {
+        Document doc = surveys.find(Filters.eq("_id", new ObjectId(id))).first();
+        return survey(doc);
+    }
+    
+    public List<Survey> getAllSurveys() {
+        List<Survey> allLinks = new ArrayList<>();
+        for (Document doc : surveys.find()) {
+            allLinks.add(survey(doc));
+        }
+        return allLinks;
+    }
 }

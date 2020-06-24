@@ -2,11 +2,11 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>arso</groupId>
-  <artifactId>MartinezRojo-Noelia-arso-laboratorio-Users</artifactId>
+  <artifactId>MartinezRojo-Noelia-arso-laboratorio-Surveys</artifactId>
   <packaging>war</packaging>
   <version>0.0.1-SNAPSHOT</version>
   
-  <name>MartinezRojo-Noelia-arso-laboratorio-Users Maven Webapp</name>
+  <name>MartinezRojo-Noelia-arso-laboratorio-Sondeos Maven Webapp</name>
   <url>http://maven.apache.org</url>
   
   	<properties>
@@ -18,6 +18,12 @@
 	</properties>
   
   <dependencies>
+   	<!-- MongoDB -->
+   	<dependency>
+      <groupId>org.mongodb</groupId>
+      <artifactId>mongodb-driver</artifactId>
+      <version>3.8.0</version>
+  	</dependency>
   	<!-- JAXB -->
   	<dependency>
 	    <groupId>com.sun.xml.bind</groupId>
@@ -74,7 +80,7 @@
   </dependencies>
   
   <build>
-     <finalName>MartinezRojo-Noelia-arso-laboratorio-Users</finalName>
+     <finalName>MartinezRojo-Noelia-arso-laboratorio-Usuarios</finalName>
      <plugins>
          <plugin>
              <groupId>org.apache.maven.plugins</groupId>
@@ -89,6 +95,11 @@
              <groupId>org.eclipse.jetty</groupId>
              <artifactId>jetty-maven-plugin</artifactId>
              <version>9.4.26.v20200117</version>
+             <configuration>
+				<httpConnector>
+			    	<port>8081</port>
+			    </httpConnector>
+			</configuration>
          </plugin>
      </plugins>
   </build>
