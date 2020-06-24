@@ -2,11 +2,11 @@
 // Este archivo ha sido generado por la arquitectura JavaTM para la implantación de la referencia de enlace (JAXB) XML v2.2.8-b130911.1802 
 // Visite <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Todas las modificaciones realizadas en este archivo se perderán si se vuelve a compilar el esquema de origen. 
-// Generado el: 2020.06.22 a las 01:16:53 PM CEST 
+// Generado el: 2020.06.24 a las 11:49:14 AM CEST 
 //
 
 
-package modelo;
+package model;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -24,9 +24,9 @@ import javax.xml.bind.annotation.XmlType;
  * &lt;complexType>
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;attribute name="nombre" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="name" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="email" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
- *       &lt;attribute name="rol" use="required" type="{http://www.example.org/usuario}rol" />
+ *       &lt;attribute name="role" use="required" type="{http://www.example.org/user}role" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -36,38 +36,38 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "")
-@XmlRootElement(name = "usuario")
-public class Usuario {
+@XmlRootElement(name = "user")
+public class User {
 
-    @XmlAttribute(name = "nombre", required = true)
-    protected String nombre;
+    @XmlAttribute(name = "name", required = true)
+    protected String name;
     @XmlAttribute(name = "email", required = true)
     protected String email;
-    @XmlAttribute(name = "rol", required = true)
-    protected Rol rol;
+    @XmlAttribute(name = "role", required = true)
+    protected Role role;
 
     /**
-     * Obtiene el valor de la propiedad nombre.
+     * Obtiene el valor de la propiedad name.
      * 
      * @return
      *     possible object is
      *     {@link String }
      *     
      */
-    public String getNombre() {
-        return nombre;
+    public String getName() {
+        return name;
     }
 
     /**
-     * Define el valor de la propiedad nombre.
+     * Define el valor de la propiedad name.
      * 
      * @param value
      *     allowed object is
      *     {@link String }
      *     
      */
-    public void setNombre(String value) {
-        this.nombre = value;
+    public void setName(String value) {
+        this.name = value;
     }
 
     /**
@@ -95,27 +95,27 @@ public class Usuario {
     }
 
     /**
-     * Obtiene el valor de la propiedad rol.
+     * Obtiene el valor de la propiedad role.
      * 
      * @return
      *     possible object is
-     *     {@link Rol }
+     *     {@link Role }
      *     
      */
-    public Rol getRol() {
-        return rol;
+    public Role getRole() {
+        return role;
     }
 
     /**
-     * Define el valor de la propiedad rol.
+     * Define el valor de la propiedad role.
      * 
      * @param value
      *     allowed object is
-     *     {@link Rol }
+     *     {@link Role }
      *     
      */
-    public void setRol(Rol value) {
-        this.rol = value;
+    public void setRole(Role value) {
+        this.role = value;
     }
 
 	@Override
@@ -123,8 +123,8 @@ public class Usuario {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((email == null) ? 0 : email.hashCode());
-		result = prime * result + ((nombre == null) ? 0 : nombre.hashCode());
-		result = prime * result + ((rol == null) ? 0 : rol.hashCode());
+		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		result = prime * result + ((role == null) ? 0 : role.hashCode());
 		return result;
 	}
 
@@ -136,18 +136,18 @@ public class Usuario {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Usuario other = (Usuario) obj;
+		User other = (User) obj;
 		if (email == null) {
 			if (other.email != null)
 				return false;
 		} else if (!email.equals(other.email))
 			return false;
-		if (nombre == null) {
-			if (other.nombre != null)
+		if (name == null) {
+			if (other.name != null)
 				return false;
-		} else if (!nombre.equals(other.nombre))
+		} else if (!name.equals(other.name))
 			return false;
-		if (rol != other.rol)
+		if (role != other.role)
 			return false;
 		return true;
 	}

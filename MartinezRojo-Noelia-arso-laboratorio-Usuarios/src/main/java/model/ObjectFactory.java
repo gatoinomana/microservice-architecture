@@ -2,11 +2,11 @@
 // Este archivo ha sido generado por la arquitectura JavaTM para la implantación de la referencia de enlace (JAXB) XML v2.2.8-b130911.1802 
 // Visite <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Todas las modificaciones realizadas en este archivo se perderán si se vuelve a compilar el esquema de origen. 
-// Generado el: 2020.06.22 a las 01:16:53 PM CEST 
+// Generado el: 2020.06.24 a las 11:49:14 AM CEST 
 //
 
 
-package modelo;
+package model;
 
 import javax.xml.bind.annotation.XmlRegistry;
 
@@ -14,7 +14,7 @@ import javax.xml.bind.annotation.XmlRegistry;
 /**
  * This object contains factory methods for each 
  * Java content interface and Java element interface 
- * generated in the usuario package. 
+ * generated in the user package. 
  * <p>An ObjectFactory allows you to programatically 
  * construct new instances of the Java representation 
  * for XML content. The Java representation of XML 
@@ -30,18 +30,18 @@ public class ObjectFactory {
 
 
     /**
-     * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: usuario
+     * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: user
      * 
      */
     public ObjectFactory() {
     }
 
     /**
-     * Create an instance of {@link Usuario }
+     * Create an instance of {@link User }
      * 
      */
-    public Usuario createUsuario() {
-        return new Usuario();
+    public User createUser() {
+        return new User();
     }
 
 }

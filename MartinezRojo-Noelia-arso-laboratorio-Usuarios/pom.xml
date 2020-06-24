@@ -2,11 +2,11 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>arso</groupId>
-  <artifactId>MartinezRojo-Noelia-arso-laboratorio-Usuarios</artifactId>
+  <artifactId>MartinezRojo-Noelia-arso-laboratorio-Users</artifactId>
   <packaging>war</packaging>
   <version>0.0.1-SNAPSHOT</version>
   
-  <name>MartinezRojo-Noelia-arso-laboratorio-Usuarios Maven Webapp</name>
+  <name>MartinezRojo-Noelia-arso-laboratorio-Users Maven Webapp</name>
   <url>http://maven.apache.org</url>
   
   	<properties>
@@ -74,7 +74,7 @@
   </dependencies>
   
   <build>
-     <finalName>MartinezRojo-Noelia-arso-laboratorio-Usuarios</finalName>
+     <finalName>MartinezRojo-Noelia-arso-laboratorio-Users</finalName>
      <plugins>
          <plugin>
              <groupId>org.apache.maven.plugins</groupId>
