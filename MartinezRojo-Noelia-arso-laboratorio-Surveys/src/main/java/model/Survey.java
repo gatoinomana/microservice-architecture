@@ -11,18 +11,18 @@ public class Survey {
 	private String id;
 	private String title;
 	private String instructions;
-	private Date openingDateTime, closingDateTime;
+	private Date starts, ends;
 	private int minOptions, maxOptions;
 	private Visibility visibility;
 	private List<String> options;
 	private Map<String, Integer> results;
 	
-	public Survey(String title, String instructions, Date openingDateTime, 
-			Date closingDateTime, int minOptions, int maxOptions, Visibility visibility) {
+	public Survey(String title, String instructions, Date starts, Date ends, 
+			int minOptions, int maxOptions, Visibility visibility) {
 		this.title = title;
 		this.instructions = instructions;
-		this.openingDateTime = openingDateTime;
-		this.closingDateTime = closingDateTime;
+		this.starts = starts;
+		this.ends = ends;
 		this.minOptions = minOptions;
 		this.maxOptions = maxOptions;
 		this.visibility = visibility;
@@ -63,20 +63,20 @@ public class Survey {
 		this.instructions = instructions;
 	}
 
-	public Date getOpeningDateTime() {
-		return openingDateTime;
+	public Date getStarts() {
+		return starts;
 	}
 
-	public void setOpeningDateTime(Date openingDateTime) {
-		this.openingDateTime = openingDateTime;
+	public void setStarts(Date starts) {
+		this.starts = starts;
 	}
 
-	public Date getClosingDateTime() {
-		return closingDateTime;
+	public Date getEnds() {
+		return ends;
 	}
 
-	public void setClosingDateTime(Date closingDateTime) {
-		this.closingDateTime = closingDateTime;
+	public void setEnds(Date ends) {
+		this.ends = ends;
 	}
 
 	public int getMinOptions() {
