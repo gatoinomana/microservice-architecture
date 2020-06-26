@@ -16,7 +16,7 @@ public class Survey {
 	private Visibility visibility;
 	private List<String> options;
 	private Map<String, Integer> results;
-	
+
 	public Survey(String title, String instructions, Date starts, Date ends, 
 			int minOptions, int maxOptions, Visibility visibility) {
 		this.title = title;
@@ -26,14 +26,15 @@ public class Survey {
 		this.minOptions = minOptions;
 		this.maxOptions = maxOptions;
 		this.visibility = visibility;
+
 		options = new LinkedList<String>();
 		results = new HashMap<String, Integer>();
 	}
 	
-	public Survey(String id, String title, String instructions, Date openingDateTime, 
-			Date closingDateTime, int minOptions, int maxOptions, Visibility visibility,
+	public Survey(String id, String title, String instructions, Date starts, 
+			Date ends, int minOptions, int maxOptions, Visibility visibility, 
 			List<String> options, Map<String, Integer> results) {
-		this(title, instructions, openingDateTime, closingDateTime, minOptions, maxOptions, visibility);
+		this(title, instructions, starts, ends, minOptions, maxOptions, visibility);
 		this.id = id;
 		this.options = options;
 		this.results = results;
@@ -131,7 +132,6 @@ public class Survey {
 			}
 		}
 	}
-
 	// TODO: Operacion modificar porcentaje de una opcion
 	
 }

@@ -1,10 +1,6 @@
 package controller;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -29,7 +25,7 @@ public class SurveyController implements SurveyControllerInterface {
 	}
 	
 	@Override
-	public String createSurvey(String title, String instructions, 
+	public String createSurvey(String creatorId, String title, String instructions, 
 			Date starts, Date ends, int minOptions, int maxOptions, 
 			Visibility visibility) throws SurveyException {
 		
@@ -44,46 +40,61 @@ public class SurveyController implements SurveyControllerInterface {
 		Survey survey = new Survey(title, instructions, starts, ends, 
 				minOptions, maxOptions, visibility);
 		
-		return surveyRepository.saveSurvey(survey).getId();
+		return surveyRepository.saveSurvey(survey, creatorId).getId();
 	}
 
 	@Override
 	public void addOption(String surveyId, String text) throws SurveyException {
 		surveyRepository.addOption(surveyId, text);
-		
 	}
-
-	@Override
-	public void removeOption(String surveyId, String text) throws SurveyException {
-		// TODO Auto-generated method stub
-		
-	}
-
+	
+	
 	@Override
 	public List<Survey> getAllSurveys() throws SurveyException {
 		return surveyRepository.getAllSurveys();
 	}
 
 	@Override
-	public void editSurvey(String title, String instructions, 
-			Date openingDateTime, Date closingDateTime,
-			int minOptions, int maxOptions, 
+	public boolean editSurvey(String surveyId, String title, String instructions, 
+			Date starts, Date ends,int minOptions, int maxOptions, 
 			Visibility visibility) throws SurveyException {
+
+		/* Comprobar que tiene título y las fechas 
+		 * y los límites de opciones son válidos */
+		Date now = new Date();
+		if (title.isEmpty() || starts.before(now) || starts.after(ends) || 
+				starts.equals(ends) || minOptions > maxOptions ||
+				minOptions == 0 || maxOptions == 0)
+			return false;
+
+		Survey newSurvey = new Survey(
+				title, instructions, starts, ends, 
+				minOptions, maxOptions, visibility);
+		
+		return surveyRepository.editBasicInformation(surveyId, newSurvey);
+	}
+
+	@Override
+	public void removeOption(String surveyId, String text) throws SurveyException {
+		surveyRepository.removeOption(surveyId, text);
+	}
+
+	@Override
+	public void removeSurvey(String surveyId) throws SurveyException {
+		surveyRepository.remove(surveyId);
+	}
+
+	@Override
+	public Map<String, Integer> getResults(String surveyId) throws SurveyException {
+		return null;
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public Map<String, Integer> getResults(String surveyId) throws SurveyException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Map<String, Integer> respondSurvey(
-			String surveyId, boolean[] responses) throws SurveyException {
-		// TODO Auto-generated method stub
-		return null;
+	public boolean respondSurvey(String surveyId, 
+			Map<String, Boolean> responses) throws SurveyException {
+		return surveyRepository.updateResults(surveyId, responses);
 	}
 
 }

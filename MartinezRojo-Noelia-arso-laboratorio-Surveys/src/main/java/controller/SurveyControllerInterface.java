@@ -12,9 +12,8 @@ public interface SurveyControllerInterface {
 	/**
 	 * Crear una encuesta. Devuelve el id de la encuesta, asignado desde la base de datos
 	 */	
-	String createSurvey(String title, String instructions, 
-			Date openingDateTime, Date closingDateTime, 
-			int minOptions, int maxOptions, 
+	String createSurvey(String idCreator, String title, String instructions, 
+			Date starts, Date ends, int minOptions, int maxOptions, 
 			Visibility visibility) throws SurveyException;
 
 	/**
@@ -26,6 +25,11 @@ public interface SurveyControllerInterface {
 	 * Eliminar una opción de una encuesta. Utilidad para editar encuestas
 	 */	
 	void removeOption(String surveyId, String text) throws SurveyException;
+
+	/**
+	 * Eliminar una encuesta
+	 */	
+	void removeSurvey(String surveyId) throws SurveyException;
 		
 	/**
 	 * Recuperar todas las encuestas
@@ -34,26 +38,26 @@ public interface SurveyControllerInterface {
 
 	/**
 	 * Editar una encuesta. Devuelve el id de la encuesta, asignado desde la base de datos
+	 * @return 
 	 */	
-	void editSurvey(String title, String instructions, 
-			Date openingDateTime, Date closingDateTime, 
-			int minOptions, int maxOptions, 
+	boolean editSurvey(String surveyId, String title, String instructions, 
+			Date starts, Date ends, int minOptions, int maxOptions, 
 			Visibility visibility) throws SurveyException;
 
 	/**
-	 * Consultar los resultados de una encuesta. Devuelve un diccionario
-	 * asociando el texto de cada opción a un porcentaje de votos
+	 * Consultar los resultados actuales de una encuesta. 
+	 * Devuelve un diccionario asociando el texto de cada opción 
+	 * a un número de votos
 	 */	
 	Map<String, Integer> getResults(
 			String surveyId) throws SurveyException;;
 	
 	/**
-	 * Consultar los resultados de una encuesta. Devuelve un diccionario
-	 * asociando el texto de cada opción a un porcentaje de votos.
-	 * Toma un diccionario asociando el texto de cada opción a un booleano
-	 * indicando seleccionada / no seleccionada
+	 * Actualiza los resultados actuales de una encuesta. 
+	 * Toma un diccionario asociando el texto de cada opción 
+	 * a un booleano (seleccionada/no seleccionada)
 	 */	
-	Map<String, Integer> respondSurvey(
-			String surveyId, boolean[] responses) throws SurveyException;;
+	boolean respondSurvey(String surveyId, 
+			Map<String, Boolean> responses) throws SurveyException;;
 
 }

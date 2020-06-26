@@ -10,15 +10,19 @@ import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
 import com.mongodb.MongoClient;
@@ -115,7 +119,8 @@ public class RESTService {
 		initDB();
 		
 		// Delegar en el controlador
-		String surveyId = controller.createSurvey(title, instructions, starts, ends, 
+		String surveyId = controller.createSurvey(
+				userId, title, instructions, starts, ends, 
 				minOptions, maxOptions, visibility);
 		
 		client.close();
@@ -147,16 +152,105 @@ public class RESTService {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
 	}
 	
-	// TODO: Cambiar a JSON
+	// TODO: return JSON
+	// TODO: Si opcion ya existe y quiere añadirla
+	// TODO: Si opcion no existe y quiere borrarla
 	@PATCH
-	@Path("/{idSurvey}/options")
+	@Path("/{surveyId}/options")
 	@Produces(MediaType.TEXT_PLAIN)
-	public Response addOption(
-			@PathParam("idSurvey") String idSurvey,
-			@FormParam("option") String option) throws SurveyException {
-		initDB();
-		controller.addOption(idSurvey, option);
+	public Response patchOption(
+			@PathParam("surveyId") String surveyId,
+			@FormParam("option") String option,
+			@FormParam("action") String action) throws SurveyException {
+		
+		if (action.equals("add")) {
+			initDB();
+			controller.addOption(surveyId, option);
+		}	
+		else if(action.equals("remove")) {
+			initDB();
+			controller.removeOption(surveyId, option);
+		}	
+		else 
+			return Response.status(Response.Status.BAD_REQUEST).build();
+		
+		client.close();
 		return null;
 	}
+	
+	// TODO: Comprobar que la edita el mismo usuario que la creo
+	@PATCH
+	@Path("/{surveyId}")
+	@Produces(MediaType.TEXT_PLAIN)
+	public Response editSurvey(
+			@QueryParam("userId") String userId,
+			@PathParam("surveyId") String surveyId,
+			@FormParam("title") String title,
+			@FormParam("instructions") String instructions,
+			@FormParam("starts") String _starts,
+			@FormParam("ends") String _ends,
+			@FormParam("minOptions") String _minOptions,
+			@FormParam("maxOptions") String _maxOptions,
+			@FormParam("visibility") String _visibility) throws SurveyException {
+		
+		// Comprobar que ningún parámetro sea nulo
+		if (userId == null || title == null || instructions == null || 
+				_starts == null || _ends == null || _minOptions == null || 
+				_maxOptions == null || _visibility == null)
+			return Response.status(Response.Status.BAD_REQUEST).build();
+		
+		// Comprobar que todos los parámetros se puedan parsear
+		Date starts, ends;
+		int minOptions, maxOptions;
+		Visibility visibility;
+		try {
+			DateFormat format = new SimpleDateFormat("d-M-yyyy_HH:mm", 
+					new Locale("es", "ES"));
+			starts = format.parse(_starts);
+			ends = format.parse(_ends);
+			minOptions = Integer.parseInt(_minOptions);
+			maxOptions = Integer.parseInt(_maxOptions);
+			visibility = Visibility.valueOf(_visibility);
+		} catch (ParseException e) {
+			return Response.status(Response.Status.BAD_REQUEST).build();
+		}
+		
+		/* Comprobar que el usuario que quiere editarla
+		 * es el mismo que la creó */
+		
+		// Conectar con base de datos
+		initDB();
+		
+		String creatorId = surveyRepository.findCreatorById(surveyId);
+		if (!userId.equals(creatorId))
+			return Response.status(Response.Status.FORBIDDEN).build();
+		
+		boolean success = controller.editSurvey(surveyId, title, instructions, starts, ends, minOptions, maxOptions, visibility);
+		
+		client.close();
+		
+		if (!success)
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+			
+		return Response.status(Response.Status.OK).entity(surveyId).type(MediaType.TEXT_PLAIN).build();
+	}
+	
+	@PATCH
+	@Path("/{surveyId}/results")
+	@Consumes("application/x-www-form-urlencoded")
+	public void vote(MultivaluedMap<String, String> formParams) {
+		
+	}
+	
+	
+//	@DELETE
+//	@Path("/{surveyId}")
+//	@Produces(MediaType.TEXT_PLAIN)
+//	public Response removeSurvey(
+//			@PathParam("surveyId") String surveyId) throws SurveyException {
+//		
+//		controller.removeSurvey();
+//		return null;
+//	}
 	
 }
