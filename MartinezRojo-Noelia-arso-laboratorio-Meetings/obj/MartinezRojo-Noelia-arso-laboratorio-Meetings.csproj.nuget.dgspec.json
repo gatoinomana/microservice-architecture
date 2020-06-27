@@ -1,0 +1,74 @@
+{
+  "format": 1,
+  "restore": {
+    "/Users/noe/git/repository/MartinezRojo-Noelia-arso-laboratorio-Meetings/MartinezRojo-Noelia-arso-laboratorio-Meetings.csproj": {}
+  },
+  "projects": {
+    "/Users/noe/git/repository/MartinezRojo-Noelia-arso-laboratorio-Meetings/MartinezRojo-Noelia-arso-laboratorio-Meetings.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/noe/git/repository/MartinezRojo-Noelia-arso-laboratorio-Meetings/MartinezRojo-Noelia-arso-laboratorio-Meetings.csproj",
+        "projectName": "MartinezRojo-Noelia-arso-laboratorio-Meetings",
+        "projectPath": "/Users/noe/git/repository/MartinezRojo-Noelia-arso-laboratorio-Meetings/MartinezRojo-Noelia-arso-laboratorio-Meetings.csproj",
+        "packagesPath": "/Users/noe/.nuget/packages/",
+        "outputPath": "/Users/noe/git/repository/MartinezRojo-Noelia-arso-laboratorio-Meetings/obj/",
+        "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "/usr/local/share/dotnet/sdk/NuGetFallbackFolder"
+        ],
+        "configFilePaths": [
+          "/Users/noe/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "netcoreapp3.1"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "netcoreapp3.1": {
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "netcoreapp3.1": {
+          "dependencies": {
+            "Microsoft.EntityFrameworkCore.InMemory": {
+              "target": "Package",
+              "version": "[*, )"
+            },
+            "Microsoft.EntityFrameworkCore.SqlServer": {
+              "target": "Package",
+              "version": "[3.1.5, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.AspNetCore.App": {
+              "privateAssets": "none"
+            },
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/3.1.301/RuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}
