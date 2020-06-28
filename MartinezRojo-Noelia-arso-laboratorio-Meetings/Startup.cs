@@ -3,8 +3,9 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.EntityFrameworkCore;
 using MartinezRojo_Noelia_arso_laboratorio_Meetings.Models;
+using MartinezRojo_Noelia_arso_laboratorio_Meetings.Services;
+using Microsoft.Extensions.Options;
 
 namespace MartinezRojo_Noelia_arso_laboratorio_Meetings
 {
@@ -20,8 +21,14 @@ namespace MartinezRojo_Noelia_arso_laboratorio_Meetings
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<MeetingContext>(opt =>
-               opt.UseInMemoryDatabase("Meeting"));
+            services.Configure<MeetingsDatabaseSettings>(
+                Configuration.GetSection(nameof(MeetingsDatabaseSettings)));
+
+            services.AddSingleton<IMeetingsDatabaseSettings>(sp =>
+                sp.GetRequiredService<IOptions<MeetingsDatabaseSettings>>().Value);
+            
+            services.AddSingleton<MeetingService>();
+            
             services.AddControllers();
         }
 
