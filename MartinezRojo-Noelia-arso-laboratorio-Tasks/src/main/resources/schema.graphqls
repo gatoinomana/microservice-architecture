@@ -1,0 +1,16 @@
+type StudentToDo {
+  studentId: String!
+}
+
+type Query {
+  allTodosStudent(studentId: String!): [StudentToDo]
+}
+
+type Mutation {
+  createStudentTodo(studentId: String!): StudentToDo
+}
+
+schema {
+  query: Query
+  mutation: Mutation
+}

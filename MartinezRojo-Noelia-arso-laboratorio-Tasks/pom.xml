@@ -2,7 +2,7 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>arso</groupId>
-  <artifactId>MartinezRojo-Noelia-arso-laboratorio-Tasks</artifactId>
+  <artifactId>MartinezRojo-Noelia-arso-laboratorio-StudentToDos</artifactId>
   <packaging>war</packaging>
   <version>0.0.1-SNAPSHOT</version>
   <name>MartinezRojo-Noelia-arso-laboratorio-Tasks Maven Webapp</name>
@@ -17,6 +17,28 @@
 	</properties>
   
   <dependencies>
+	<dependency>
+	<!-- GraphQL -->
+        <groupId>com.graphql-java</groupId>
+        <artifactId>graphql-java</artifactId>
+        <version>3.0.0</version>
+    </dependency>
+    <dependency>
+        <groupId>com.graphql-java</groupId>
+        <artifactId>graphql-java-tools</artifactId>
+        <version>3.2.0</version>
+    </dependency>
+    <dependency>
+        <groupId>com.graphql-java</groupId>
+        <artifactId>graphql-java-servlet</artifactId>
+        <version>4.0.0</version>
+    </dependency>
+    <dependency>
+        <groupId>javax.servlet</groupId>
+        <artifactId>javax.servlet-api</artifactId>
+        <version>3.0.1</version>
+        <scope>provided</scope>
+    </dependency>      
 	<!-- RabbitMQ -->
       <dependency>
         <groupId>com.rabbitmq</groupId>
@@ -106,7 +128,7 @@
   </dependencies>
   
   <build>
-         <finalName>MartinezRojo-Noelia-arso-laboratorio-Tasks</finalName>
+         <finalName>MartinezRojo-Noelia-arso-laboratorio-StudentToDos</finalName>
      <plugins>
          <plugin>
              <groupId>org.apache.maven.plugins</groupId>
