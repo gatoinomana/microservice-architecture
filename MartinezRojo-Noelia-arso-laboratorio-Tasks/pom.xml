@@ -2,11 +2,10 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>arso</groupId>
-  <artifactId>MartinezRojo-Noelia-arso-laboratorio-Surveys</artifactId>
+  <artifactId>MartinezRojo-Noelia-arso-laboratorio-Tasks</artifactId>
   <packaging>war</packaging>
   <version>0.0.1-SNAPSHOT</version>
-  
-  <name>MartinezRojo-Noelia-arso-laboratorio-Sondeos Maven Webapp</name>
+  <name>MartinezRojo-Noelia-arso-laboratorio-Tasks Maven Webapp</name>
   <url>http://maven.apache.org</url>
   
   	<properties>
@@ -18,7 +17,7 @@
 	</properties>
   
   <dependencies>
-  	<!-- RabbitMQ -->
+	<!-- RabbitMQ -->
       <dependency>
         <groupId>com.rabbitmq</groupId>
         <artifactId>amqp-client</artifactId>
@@ -107,7 +106,7 @@
   </dependencies>
   
   <build>
-     <finalName>MartinezRojo-Noelia-arso-laboratorio-Usuarios</finalName>
+         <finalName>MartinezRojo-Noelia-arso-laboratorio-Tasks</finalName>
      <plugins>
          <plugin>
              <groupId>org.apache.maven.plugins</groupId>
@@ -124,7 +123,7 @@
              <version>9.4.26.v20200117</version>
              <configuration>
 				<httpConnector>
-			    	<port>8081</port>
+			    	<port>8082</port>
 			    </httpConnector>
 			</configuration>
          </plugin>
