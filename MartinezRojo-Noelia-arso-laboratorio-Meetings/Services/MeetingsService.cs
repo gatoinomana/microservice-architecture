@@ -5,11 +5,11 @@ using System.Linq;
 
 namespace MartinezRojo_Noelia_arso_laboratorio_Meetings.Services
 {
-    public class MeetingService
+    public class MeetingsService
     {
         private readonly IMongoCollection<Meeting> _meetings;
 
-        public MeetingService(IMeetingsDatabaseSettings settings)
+        public MeetingsService(IMeetingsDatabaseSettings settings)
         {
             var client = new MongoClient(settings.ConnectionString);
             var database = client.GetDatabase(settings.DatabaseName);

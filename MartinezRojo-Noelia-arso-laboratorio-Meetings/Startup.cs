@@ -1,3 +1,4 @@
+using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -21,13 +22,16 @@ namespace MartinezRojo_Noelia_arso_laboratorio_Meetings
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddHttpClient();
+
             services.Configure<MeetingsDatabaseSettings>(
                 Configuration.GetSection(nameof(MeetingsDatabaseSettings)));
 
             services.AddSingleton<IMeetingsDatabaseSettings>(sp =>
                 sp.GetRequiredService<IOptions<MeetingsDatabaseSettings>>().Value);
             
-            services.AddSingleton<MeetingService>();
+            services.AddSingleton<MeetingsService>();
+            services.AddSingleton<UsersServiceFacade>();
             
             services.AddControllers();
         }

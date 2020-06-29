@@ -13,25 +13,28 @@ namespace MartinezRojo_Noelia_arso_laboratorio_Meetings.Controllers
     [ApiController]
     public class MeetingsController : ControllerBase
     {
-        private readonly MeetingService _meetingService;
+        private readonly MeetingsService _meetingsService;
+        private readonly UsersServiceFacade _usersService;
 
-        public MeetingsController(MeetingService meetingService)
+        public MeetingsController(MeetingsService meetingsService, 
+        UsersServiceFacade usersService)
         {
-            _meetingService = meetingService;
+            _meetingsService = meetingsService;
+            _usersService = usersService;
         }
 
         // GET: api/Meetings
         [HttpGet]
         public ActionResult<List<Meeting>> GetMeetings()
         {
-            return _meetingService.Get();
+            return _meetingsService.Get();
         }
             
         // GET: api/Meetings/5
         [HttpGet("{id:length(24)}", Name = "GetMeeting")]
         public ActionResult<Meeting> GetMeeting(string id)
         {
-            var meeting = _meetingService.Get(id);
+            var meeting = _meetingsService.Get(id);
 
             if (meeting == null)
             {
@@ -47,14 +50,14 @@ namespace MartinezRojo_Noelia_arso_laboratorio_Meetings.Controllers
         [HttpPut("{id:length(24)}")]
         public IActionResult PutMeeting(string id, Meeting meetingIn)
         {
-            var meeting = _meetingService.Get(id);
+            var meeting = _meetingsService.Get(id);
 
             if (meeting == null)
             {
                 return NotFound();
             }
 
-            _meetingService.Update(id, meetingIn);
+            _meetingsService.Update(id, meetingIn);
 
             return NoContent();
         }
@@ -63,25 +66,32 @@ namespace MartinezRojo_Noelia_arso_laboratorio_Meetings.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPost]
-        public ActionResult<Meeting> PostMeeting(Meeting meeting)
+        public async Task<ActionResult<Meeting>> PostMeeting(Meeting meeting)
         {
-            _meetingService.Create(meeting);
+            await _usersService.OnGet(meeting.Organizer);
+            var organizerRole = _usersService.UserRole;
 
-            return CreatedAtAction("GetMeeting", new { id = meeting.Id.ToString() }, meeting);
+            if (organizerRole != null && organizerRole.Equals("TEACHER"))
+            {
+                _meetingsService.Create(meeting);
+                return CreatedAtAction("GetMeeting", new { id = meeting.Id.ToString() }, meeting);
+            }
+
+            else return StatusCode(403);
         }
 
         // DELETE: api/Meetings/5
         [HttpDelete("{id:length(24)}")]
         public IActionResult DeleteMeeting(string id)
         {
-            var meeting = _meetingService.Get(id);
+            var meeting = _meetingsService.Get(id);
 
             if (meeting == null)
             {
                 return NotFound();
             }
 
-            _meetingService.Remove(meeting.Id);
+            _meetingsService.Remove(meeting.Id);
 
             return NoContent();
         }
