@@ -1,13 +1,13 @@
-type StudentToDo {
+type Todo {
   studentId: String!
 }
 
 type Query {
-  allTodosStudent(studentId: String!): [StudentToDo]
+  allTodosStudent(studentId: String!): [Todo]
 }
 
 type Mutation {
-  createStudentTodo(studentId: String!): StudentToDo
+  createTodo(studentId: String!): Todo
 }
 
 schema {

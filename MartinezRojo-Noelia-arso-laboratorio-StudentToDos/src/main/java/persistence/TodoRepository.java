@@ -7,33 +7,33 @@ import org.bson.Document;
 
 import com.mongodb.client.MongoCollection;
 
-import model.StudentToDo;
+import model.Todo;
 
-public class StudentToDoRepository {
+public class TodoRepository {
 	
     private final MongoCollection<Document> todos;
     
-    public StudentToDoRepository(MongoCollection<Document> todos) {
+    public TodoRepository(MongoCollection<Document> todos) {
         this.todos = todos;
     }
 
-	public StudentToDo save(StudentToDo newStudentToDo) {
+	public Todo save(Todo newTodo) {
 		Document doc = new Document();
-		doc.append("studentId", newStudentToDo.getStudentId());
+		doc.append("studentId", newTodo.getStudentId());
 		todos.insertOne(doc);
-		return newStudentToDo;
+		return newTodo;
 	}
     
-	public List<StudentToDo> getAllTodos() {
-		List<StudentToDo> allTodos = new ArrayList<>();
+	public List<Todo> getAllTodos() {
+		List<Todo> allTodos = new ArrayList<>();
         for (Document doc : todos.find()) {
         	allTodos.add(todo(doc));
         }
         return allTodos;
 	}
 	
-	private StudentToDo todo(Document doc) {
-		 return new StudentToDo(
+	private Todo todo(Document doc) {
+		 return new Todo(
 	                doc.getString("studentId"));
 	}
 }

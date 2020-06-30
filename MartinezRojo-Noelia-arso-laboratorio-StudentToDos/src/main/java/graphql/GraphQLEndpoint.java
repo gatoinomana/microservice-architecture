@@ -9,13 +9,13 @@ import com.mongodb.client.MongoDatabase;
 
 import graphql.schema.GraphQLSchema;
 import graphql.servlet.SimpleGraphQLServlet;
-import persistence.StudentToDoRepository;
+import persistence.TodoRepository;
 
 @SuppressWarnings("serial")
 @WebServlet(urlPatterns = "/graphql")
 public class GraphQLEndpoint extends SimpleGraphQLServlet {
 
-	private static StudentToDoRepository todoRepository;
+	private static TodoRepository todoRepository;
 	private static MongoClient client;
 
 	private static void initDB() {
@@ -24,7 +24,7 @@ public class GraphQLEndpoint extends SimpleGraphQLServlet {
 
 		client = new MongoClient(uri);
 	    MongoDatabase mongo = client.getDatabase("arso");
-	    todoRepository = new StudentToDoRepository(mongo.getCollection("todos"));
+	    todoRepository = new TodoRepository(mongo.getCollection("todos"));
 	}
 
 	@Override

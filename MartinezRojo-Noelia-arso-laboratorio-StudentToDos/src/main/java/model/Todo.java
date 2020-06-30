@@ -1,9 +1,9 @@
 package model;
 
-public class StudentToDo {
+public class Todo {
 	private String studentId;
 
-	public StudentToDo(String studentId) {
+	public Todo(String studentId) {
 		this.studentId = studentId;
 	}
 

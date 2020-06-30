@@ -39,21 +39,11 @@
         <version>3.0.1</version>
         <scope>provided</scope>
     </dependency>      
-    <dependency>
-        <groupId>org.slf4j</groupId>
-        <artifactId>slf4j-simple</artifactId>
-        <version>1.7.30</version>
-    </dependency>
 	<!-- RabbitMQ -->
       <dependency>
         <groupId>com.rabbitmq</groupId>
         <artifactId>amqp-client</artifactId>
         <version>5.8.0</version>
-    </dependency>
-    <dependency>
-        <groupId>org.slf4j</groupId>
-        <artifactId>slf4j-simple</artifactId>
-        <version>1.7.30</version>
     </dependency>
    	<!-- MongoDB -->
    	<dependency>
@@ -74,12 +64,6 @@
 		<version>${junit.platform.version}</version>
 		<scope>test</scope>
 	</dependency>
-    <!-- Herramienta Swagger (documentación) -->
-    <dependency>
-        <groupId>io.swagger</groupId>
-        <artifactId>swagger-jersey-jaxrs</artifactId>
-        <version>1.5.0</version>
-    </dependency>
     <!-- Para el servidor web Jetty -->
     <dependency>
         <groupId>org.slf4j</groupId>
