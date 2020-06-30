@@ -1,12 +1,17 @@
 package rest;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.concurrent.TimeoutException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -38,6 +43,11 @@ import model.Survey;
 import model.Visibility;
 import persistence.SurveyRepository;
 
+import com.rabbitmq.client.ConnectionFactory;
+import com.rabbitmq.client.AMQP;
+import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.Connection;
+
 @Path("surveys")
 @Api
 public class RESTService {
@@ -47,6 +57,11 @@ public class RESTService {
 	private static MongoClient client;
 	private static SurveyRepository surveyRepository;
 	private static SurveyControllerInterface controller;
+	private static Connection msgConnection;
+	private static Channel msgChannel;
+    final static String exchangeName = "arso-exchange";
+    final static String queueName = "arso-queue";
+    final static String routingKey = "arso-queue";
 	
 	// TODO: Devolver JSON
 	/**
@@ -55,12 +70,41 @@ public class RESTService {
 	private static void initDB() {
 		MongoClientURI uri = new MongoClientURI(
 			    "mongodb://arso:arso-20@cluster0-shard-00-00-xi0ku.azure.mongodb.net:27017,cluster0-shard-00-01-xi0ku.azure.mongodb.net:27017,cluster0-shard-00-02-xi0ku.azure.mongodb.net:27017/arso?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin&retryWrites=true&w=majority");
-
+		
 		client = new MongoClient(uri);
-	    MongoDatabase mongo = client.getDatabase("arso");
-	    surveyRepository = SurveyRepository.getInstance(mongo.getCollection("surveys"));
+		MongoDatabase mongo = client.getDatabase("arso");
+		surveyRepository = SurveyRepository.getInstance(mongo.getCollection("surveys"));
 	    controller = SurveyController.getInstance(surveyRepository);
-	 }
+	}
+	
+	private static void initMsgQueue() throws IOException, TimeoutException, 
+	KeyManagementException, NoSuchAlgorithmException, URISyntaxException {
+		
+	    ConnectionFactory factory = new ConnectionFactory();
+	    factory.setUri("amqp://vcqubngz:jyA59K9eMnlB7zuqfh73lr5WeEPLjQ89@stingray.rmq.cloudamqp.com/vcqubngz");
+
+	    msgConnection = factory.newConnection();
+
+	    msgChannel = msgConnection.createChannel();
+
+	    try {
+	        boolean durable = true;
+	        msgChannel.exchangeDeclare(exchangeName, "direct", durable);
+
+	        boolean exclusive = false;
+	        boolean autodelete = false;
+	        Map<String, Object> properties = null; // sin propiedades
+	        msgChannel.queueDeclare(queueName, durable, exclusive, autodelete, properties);    
+	        
+	        msgChannel.queueBind(queueName, exchangeName, routingKey);
+	    } catch (IOException e) {
+
+	        String mensaje = e.getMessage() == null ? 
+	        		e.getCause().getMessage() : e.getMessage();
+
+	        System.out.println("No se ha podido establecer la conexion con el exchange o la cola: \n\t->" + mensaje);
+	    }
+	}
 	
 	@POST
 	@ApiOperation(	value = "Creación de una encuesta", 
@@ -80,7 +124,7 @@ public class RESTService {
 			@FormParam("ends") String _ends,
 			@FormParam("minOptions") String _minOptions,
 			@FormParam("maxOptions") String _maxOptions,
-			@FormParam("visibility") String _visibility) throws SurveyException, IOException {
+			@FormParam("visibility") String _visibility) throws SurveyException, IOException, KeyManagementException, NoSuchAlgorithmException, TimeoutException, URISyntaxException {
 		
 		// Comprobar que ningún parámetro sea nulo
 		if (userId == null || title == null || instructions == null || 
@@ -126,6 +170,20 @@ public class RESTService {
 		if (surveyId == null)
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
 		
+		// Informar al servicio StudentToDos
+		initMsgQueue();
+		
+        String mensaje = "creada survey"; // Objeto JSON en formato cadena
+        
+    	msgChannel.basicPublish(exchangeName, routingKey, 
+                new AMQP.BasicProperties.Builder()
+                    .contentType("text/plain")
+                    .build()                
+                , mensaje.getBytes());
+		
+    	msgChannel.close();
+    	msgConnection.close();
+    	
 		return Response.status(Response.Status.OK).entity(surveyId).type(MediaType.TEXT_PLAIN).build();
 	}
 	
