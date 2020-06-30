@@ -6,11 +6,6 @@ type Query {
   allTodosStudent(studentId: String!): [Todo]
 }
 
-type Mutation {
-  createTodo(studentId: String!): Todo
-}
-
 schema {
   query: Query
-  mutation: Mutation
 }
