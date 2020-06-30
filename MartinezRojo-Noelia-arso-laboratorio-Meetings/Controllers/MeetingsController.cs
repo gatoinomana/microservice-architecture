@@ -15,12 +15,14 @@ namespace MartinezRojo_Noelia_arso_laboratorio_Meetings.Controllers
     {
         private readonly MeetingsService _meetingsService;
         private readonly UsersServiceFacade _usersService;
+        private readonly MsgQueueService _msgQueueService;
 
         public MeetingsController(MeetingsService meetingsService, 
-        UsersServiceFacade usersService)
+        UsersServiceFacade usersService, MsgQueueService msgQueueService)
         {
             _meetingsService = meetingsService;
             _usersService = usersService;
+            _msgQueueService = msgQueueService;
         }
 
         // GET: api/Meetings
@@ -74,6 +76,10 @@ namespace MartinezRojo_Noelia_arso_laboratorio_Meetings.Controllers
             if (organizerRole != null && organizerRole.Equals("TEACHER"))
             {
                 _meetingsService.Create(meeting);
+
+                // Produce RabbitMQ message
+                _msgQueueService.ProduceMessage("creada reunion");
+
                 return CreatedAtAction("GetMeeting", new { id = meeting.Id.ToString() }, meeting);
             }
 

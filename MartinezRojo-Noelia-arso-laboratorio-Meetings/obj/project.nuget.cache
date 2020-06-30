@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "nL793QNrZ0RbqyTtikLP83AlCWqoqf8Ta+cUC7G4tZ/l5KhEMiSdfCb/0Z4UQ5LQ3zT47e6Mq9vbqIYtHMW3FA==",
+  "dgSpecHash": "Yt6064VWMoqWAG3EEtDiMEwaZfoogkZF5y2WfI7q2ETm2Q8+/D7YXqFM1LfimYrjvLGrhhq1tF3rXI928JyQMA==",
   "success": true,
   "projectFilePath": "/Users/noe/git/repository/MartinezRojo-Noelia-arso-laboratorio-Meetings/MartinezRojo-Noelia-arso-laboratorio-Meetings.csproj",
   "expectedPackageFiles": [
@@ -60,6 +60,7 @@
     "/Users/noe/.nuget/packages/newtonsoft.json/12.0.2/newtonsoft.json.12.0.2.nupkg.sha512",
     "/Users/noe/.nuget/packages/newtonsoft.json.bson/1.0.2/newtonsoft.json.bson.1.0.2.nupkg.sha512",
     "/Users/noe/.nuget/packages/nuget.frameworks/4.7.0/nuget.frameworks.4.7.0.nupkg.sha512",
+    "/Users/noe/.nuget/packages/rabbitmq.client/6.0.0/rabbitmq.client.6.0.0.nupkg.sha512",
     "/Users/noe/.nuget/packages/runtime.debian.8-x64.runtime.native.system.security.cryptography.openssl/4.3.2/runtime.debian.8-x64.runtime.native.system.security.cryptography.openssl.4.3.2.nupkg.sha512",
     "/Users/noe/.nuget/packages/runtime.fedora.23-x64.runtime.native.system.security.cryptography.openssl/4.3.2/runtime.fedora.23-x64.runtime.native.system.security.cryptography.openssl.4.3.2.nupkg.sha512",
     "/Users/noe/.nuget/packages/runtime.fedora.24-x64.runtime.native.system.security.cryptography.openssl/4.3.2/runtime.fedora.24-x64.runtime.native.system.security.cryptography.openssl.4.3.2.nupkg.sha512",
@@ -120,7 +121,7 @@
     "/Users/noe/.nuget/packages/system.linq/4.3.0/system.linq.4.3.0.nupkg.sha512",
     "/Users/noe/.nuget/packages/system.linq.expressions/4.3.0/system.linq.expressions.4.3.0.nupkg.sha512",
     "/Users/noe/.nuget/packages/system.linq.queryable/4.0.1/system.linq.queryable.4.0.1.nupkg.sha512",
-    "/Users/noe/.nuget/packages/system.memory/4.5.3/system.memory.4.5.3.nupkg.sha512",
+    "/Users/noe/.nuget/packages/system.memory/4.5.4/system.memory.4.5.4.nupkg.sha512",
     "/Users/noe/.nuget/packages/system.net.http/4.3.0/system.net.http.4.3.0.nupkg.sha512",
     "/Users/noe/.nuget/packages/system.net.nameresolution/4.3.0/system.net.nameresolution.4.3.0.nupkg.sha512",
     "/Users/noe/.nuget/packages/system.net.primitives/4.3.0/system.net.primitives.4.3.0.nupkg.sha512",

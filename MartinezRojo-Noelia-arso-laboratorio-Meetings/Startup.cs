@@ -32,6 +32,7 @@ namespace MartinezRojo_Noelia_arso_laboratorio_Meetings
             
             services.AddSingleton<MeetingsService>();
             services.AddSingleton<UsersServiceFacade>();
+            services.AddSingleton<MsgQueueService>();
             
             services.AddControllers();
         }

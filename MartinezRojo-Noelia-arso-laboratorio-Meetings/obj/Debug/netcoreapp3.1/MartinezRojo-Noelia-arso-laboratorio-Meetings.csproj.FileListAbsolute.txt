@@ -134,3 +134,4 @@
 /Users/noe/git/repository/MartinezRojo-Noelia-arso-laboratorio-Meetings/bin/Debug/netcoreapp3.1/MongoDB.Libmongocrypt.dll
 /Users/noe/git/repository/MartinezRojo-Noelia-arso-laboratorio-Meetings/bin/Debug/netcoreapp3.1/Newtonsoft.Json.Bson.dll
 /Users/noe/git/repository/MartinezRojo-Noelia-arso-laboratorio-Meetings/bin/Debug/netcoreapp3.1/SharpCompress.dll
+/Users/noe/git/repository/MartinezRojo-Noelia-arso-laboratorio-Meetings/bin/Debug/netcoreapp3.1/RabbitMQ.Client.dll
