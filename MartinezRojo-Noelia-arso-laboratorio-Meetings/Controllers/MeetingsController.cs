@@ -7,6 +7,8 @@ using Microsoft.EntityFrameworkCore;
 using MartinezRojo_Noelia_arso_laboratorio_Meetings.Models;
 using MartinezRojo_Noelia_arso_laboratorio_Meetings.Services;
 using System.Net.Http;
+using Microsoft.AspNetCore.JsonPatch;
+using Newtonsoft.Json.Linq;
 
 namespace MartinezRojo_Noelia_arso_laboratorio_Meetings.Controllers
 {
@@ -128,5 +130,65 @@ namespace MartinezRojo_Noelia_arso_laboratorio_Meetings.Controllers
 
             return NoContent();
         }
+
+        [HttpPatch("{id:length(24)}")]
+        public async Task<ActionResult<Meeting>> BookMeeting(string id, [FromBody] JObject data)
+        {
+            DateTime intervalStartTime = data["intervalStartTime"].ToObject<DateTime>();
+            string studentId = data["studentId"].ToString();
+ 
+            // Check meeting exists
+            var meeting = _meetingsService.Get(id);
+
+            if (meeting == null)
+            {
+                return NotFound();
+            }
+
+            // Check interval exists and has a free spot
+            Interval interval = meeting.Intervals.Find(i => i.StartTime.Equals(intervalStartTime));
+            int filledSpots = interval.Attendees.Count(elem => elem != null);
+
+            if (interval == null)
+            {
+                return NotFound();
+            }
+            else if (filledSpots == interval.Spots)
+            {
+                return StatusCode(403);
+            }
+
+            // Check user exists and is student
+            try 
+            {
+                await _usersService.OnGet(studentId);
+            } 
+            catch(HttpRequestException e)
+            {
+                Console.WriteLine("HttpRequestException: {0}", e);
+                return StatusCode(500);
+            }
+            
+            var userRole = _usersService.UserRole;
+
+            if (userRole == null || !userRole.Equals("STUDENT"))
+            {
+                return StatusCode(403);
+            }
+
+            // Fill spot
+            string[] attendees = meeting.Intervals[meeting.Intervals.IndexOf(interval)].Attendees;
+            int i = 0;
+            while(i < attendees.Length && attendees[i] != null) {
+                i++;
+            }
+            meeting.Intervals[meeting.Intervals.IndexOf(interval)].Attendees[i] = studentId;
+            
+            _meetingsService.Update(id, meeting);
+
+            return CreatedAtAction("GetMeeting", new { id = meeting.Id.ToString() }, meeting);
+        }
+
+
     }
 }

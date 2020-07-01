@@ -7,6 +7,9 @@ using Microsoft.Extensions.Hosting;
 using MartinezRojo_Noelia_arso_laboratorio_Meetings.Models;
 using MartinezRojo_Noelia_arso_laboratorio_Meetings.Services;
 using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Formatters;
+using System.Linq;
 
 namespace MartinezRojo_Noelia_arso_laboratorio_Meetings
 {
@@ -35,6 +38,7 @@ namespace MartinezRojo_Noelia_arso_laboratorio_Meetings
             services.AddSingleton<MsgQueueService>();
             
             services.AddControllers();
+            services.AddMvc().AddNewtonsoftJson();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
