@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MartinezRojo_Noelia_arso_laboratorio_Meetings.Models;
 using MartinezRojo_Noelia_arso_laboratorio_Meetings.Services;
+using System.Net.Http;
 
 namespace MartinezRojo_Noelia_arso_laboratorio_Meetings.Controllers
 {
@@ -70,14 +71,40 @@ namespace MartinezRojo_Noelia_arso_laboratorio_Meetings.Controllers
         [HttpPost]
         public async Task<ActionResult<Meeting>> PostMeeting(Meeting meeting)
         {
-            await _usersService.OnGet(meeting.Organizer);
+            try {
+                await _usersService.OnGet(meeting.Organizer);
+            } 
+            catch(HttpRequestException e) {
+                Console.WriteLine("HttpRequestException: {0}", e);
+                return StatusCode(500);
+            }
             var organizerRole = _usersService.UserRole;
 
             if (organizerRole != null && organizerRole.Equals("TEACHER"))
             {
+                // Add calculated intervals to meeting
+                int numIntervals = meeting.TotalSpots / meeting.SpotsPerInterval;
+                TimeSpan totalTime = meeting.EndTime - meeting.StartTime;
+                TimeSpan timePerInterval = totalTime / numIntervals;
+                DateTime intervalStartTime = meeting.StartTime;
+                DateTime intervalEndTime = intervalStartTime + timePerInterval;
+
+                for(int i = 0; i < numIntervals; i++) {
+                    meeting.Intervals.Add(new Interval());
+                    var num = meeting.Intervals.Count;
+                    meeting.Intervals[i].Spots = meeting.SpotsPerInterval;
+                    meeting.Intervals[i].Attendees = new string[meeting.Intervals[i].Spots];
+                    meeting.Intervals[i].StartTime = intervalStartTime;
+                    meeting.Intervals[i].EndTime = intervalEndTime;
+
+                    intervalStartTime = intervalEndTime;
+                    intervalEndTime = intervalStartTime + timePerInterval;
+                }
+
+                // Save meeting to database
                 _meetingsService.Create(meeting);
 
-                // Produce RabbitMQ message
+                // Produce event
                 _msgQueueService.ProduceMessage("creada reunion");
 
                 return CreatedAtAction("GetMeeting", new { id = meeting.Id.ToString() }, meeting);

@@ -1,6 +1,7 @@
 using System;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using System.Collections.Generic;
 public class Meeting
 {
     [BsonId]
@@ -17,4 +18,6 @@ public class Meeting
     public int TotalSpots { get; set; }
     public int SpotsPerInterval { get; set; }
     public Boolean PublicAttendeeList { get; set; }
+    public List<Interval> Intervals { get; set; }
+    
 }
