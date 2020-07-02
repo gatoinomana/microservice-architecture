@@ -1,21 +1,21 @@
 package rest;
 
-import java.io.IOException;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
+import javax.json.Json;
+import javax.json.JsonArray;
+import javax.json.JsonArrayBuilder;
+import javax.json.JsonObject;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import controller.UserController;
-import controller.UserControllerInterface;
-import controller.UserException;
+import controller.UsersController;
+import controller.UsersException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -27,39 +27,85 @@ import model.User;
 @Api
 public class RESTService {
 	
-	private UserControllerInterface controller = UserController.getInstance();
-	@Context
-	private HttpServletRequest peticion;
+	private UsersController usersController = UsersController.getInstance();
 	
 	@GET
 	@Path("/teachers")
-	@Produces(MediaType.APPLICATION_XML)
-	@ApiOperation(value = "Método de consulta de todos los usuarios con rol profesor", notes = "Retorna una lista de Usuario", response = List.class)
+	@Produces(MediaType.APPLICATION_JSON)
+	@ApiOperation(value = "Returns a JSON document with an array of all users with the role \"TEACHER\"")
 	@ApiResponses(value = { 
-		@ApiResponse(code = HttpServletResponse.SC_OK, message = "Consulta con éxito"),
-		@ApiResponse(code = HttpServletResponse.SC_INTERNAL_SERVER_ERROR, message = "Error interno del servidor")
+		@ApiResponse(code = HttpServletResponse.SC_OK, message = ""),
+		@ApiResponse(code = HttpServletResponse.SC_INTERNAL_SERVER_ERROR, message = "")
 	})
-	public Response getProfesores() throws UserException {
+	public Response getAllTeachers() throws UsersException {
 		
-		List<User> profesores = controller.getAllTeachers();
-		return Response.status(Response.Status.OK).entity(profesores).type(MediaType.APPLICATION_XML).build();
+		List<User> allTeachers = usersController.getAllTeachers();
+		
+		JsonObject jsonObject = Json.createObjectBuilder()
+				.add("teachers", jsonArrayFromUserList(allTeachers)).build();
+
+		return Response.status(Response.Status.OK).entity(jsonObject.toString())
+				.type(MediaType.APPLICATION_JSON).build();
 	}
 	
 	@GET
-	@Path("/{id}/role")
-	@Produces(MediaType.TEXT_PLAIN)
-	@ApiOperation(value = "Método de consulta del rol de un usuario", notes = "Retorna una cadena", response = Role.class)
+	@Path("/students")
+	@Produces(MediaType.APPLICATION_JSON)
+	@ApiOperation(value = "Returns a JSON document with an array of all users with the role \"STUDENT\"")
 	@ApiResponses(value = { 
-		@ApiResponse(code = HttpServletResponse.SC_OK, message = "Consulta con éxito"),
-		@ApiResponse(code = HttpServletResponse.SC_NOT_FOUND, message = "Usuario no encontrado"), 
-		@ApiResponse(code = HttpServletResponse.SC_INTERNAL_SERVER_ERROR, message = "Error interno del servidor")
+		@ApiResponse(code = HttpServletResponse.SC_OK, message = ""),
+		@ApiResponse(code = HttpServletResponse.SC_INTERNAL_SERVER_ERROR, message = "")
 	})
-	public Response getRol(@PathParam("id") String id) throws IOException, UserException {
+	public Response getAllStudents() throws UsersException {
 		
-		Role rol = controller.getRole(id);
-		if (rol == null)
+		List<User> allStudents = usersController.getAllTeachers();
+		
+		JsonObject jsonObject = Json.createObjectBuilder()
+				.add("teachers", jsonArrayFromUserList(allStudents)).build();
+
+		return Response.status(Response.Status.OK).entity(jsonObject.toString())
+				.type(MediaType.APPLICATION_JSON).build();
+	}
+	
+	
+	@GET
+	@Path("/{id}/role")
+	@Produces(MediaType.APPLICATION_JSON)
+	@ApiOperation(value = "Returns a JSON document with the role of a user, given their id")
+	@ApiResponses(value = { 
+		@ApiResponse(code = HttpServletResponse.SC_OK, message = ""),
+		@ApiResponse(code = HttpServletResponse.SC_NOT_FOUND, message = "The id does not belong to an existing user"), 
+		@ApiResponse(code = HttpServletResponse.SC_INTERNAL_SERVER_ERROR, message = "")
+	})
+	public Response getRole(@PathParam("id") String id) throws UsersException {
+		
+		Role role = usersController.getRole(id);
+		
+		if (role == null)
 			return Response.status(Response.Status.NOT_FOUND).build();
-		return Response.status(Response.Status.OK).entity(rol.toString()).type(MediaType.TEXT_PLAIN).build();
 		
+		JsonObject jsonObject = Json.createObjectBuilder().add("role", role.toString()).build();
+		
+		return Response.status(Response.Status.OK).entity(jsonObject.toString()).type(MediaType.APPLICATION_JSON).build();
+	}
+	
+	/**
+	 * Builds a JSON array from any list of users
+	 */
+	private static JsonArray jsonArrayFromUserList(List<User> users) {
+		
+		JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
+		
+		for(User u : users) {
+			arrayBuilder
+				.add(Json.createObjectBuilder()
+					.add("name", u.getName())
+					.add("email", u.getEmail())
+					.add("role", u.getRole().toString())
+					.build()
+				);
+		}
+		
+		return arrayBuilder.build();
 	}
 }

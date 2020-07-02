@@ -10,7 +10,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
-import controller.UserException;
+import controller.UsersException;
 import model.Role;
 import model.User;
 
@@ -25,7 +25,7 @@ public class UserRepository implements UserRepositoryInterface {
 		return instance;
 	}
 
-	public String saveUser(User user) throws UserException {
+	public String saveUser(User user) throws UsersException {
 		String id = user.getEmail();
 
 		try {
@@ -35,12 +35,12 @@ public class UserRepository implements UserRepositoryInterface {
 			marshaller.marshal(user, new File("xml/" + id + ".xml"));
 			return id;
 		} catch (JAXBException e) {
-			throw new UserException("Error al persistir usuario", e);
+			throw new UsersException("Error al persistir usuario", e);
 		}
 		
 	}
 
-	public User loadUser(String id) throws UserException {
+	public User loadUser(String id) throws UsersException {
 		File f = new File("./xml/" + id + ".xml");
 		if (!f.exists()) {
 			return null;
@@ -51,19 +51,19 @@ public class UserRepository implements UserRepositoryInterface {
 			User usuario = (User) unmarshaller.unmarshal(f);
 			return usuario;
 		} catch (JAXBException e) {
-			throw new UserException("Error al cargar usuario", e);
+			throw new UsersException("Error al cargar usuario", e);
 		}
 	}
 
-	public List<User> loadTeachers() throws UserException {
+	public List<User> loadTeachers() throws UsersException {
 		return loadUsers(Role.TEACHER);
 	}
 
-	public List<User> loadStudents() throws UserException {
+	public List<User> loadStudents() throws UsersException {
 		return loadUsers(Role.STUDENT);
 	}
 
-	public boolean removeUser(String id) throws UserException {
+	public boolean removeUser(String id) throws UsersException {
 		File f = new File("xml/", id + ".xml");
 		if (f.exists()) {
 			f.delete();
@@ -73,7 +73,7 @@ public class UserRepository implements UserRepositoryInterface {
 			
 	}
 
-	public void removeUsers() throws UserException {
+	public void removeUsers() throws UsersException {
 		File[] ficherosXML = new File("xml").listFiles(getXMLFilenameFilter());
 		
 		for (File f : ficherosXML) {
@@ -89,7 +89,7 @@ public class UserRepository implements UserRepositoryInterface {
 		};
 	}
 	
-	private List<User> loadUsers(Role role) throws UserException {
+	private List<User> loadUsers(Role role) throws UsersException {
 		LinkedList<User> usuarios = new LinkedList<User>();
 		File[] ficherosXML = new File("xml").listFiles(getXMLFilenameFilter());
 		

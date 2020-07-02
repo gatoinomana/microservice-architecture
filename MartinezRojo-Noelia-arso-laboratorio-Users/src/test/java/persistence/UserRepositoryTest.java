@@ -10,7 +10,7 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import controller.UserException;
+import controller.UsersException;
 import model.Role;
 import model.User;
 import persistence.UserRepository;
@@ -43,7 +43,7 @@ class UserRepositoryTest {
 	}
 	
 	@AfterAll
-	private static void afterAll() throws UserException {
+	private static void afterAll() throws UsersException {
 		userPersistence.removeUser(student1.getEmail());
 		userPersistence.removeUser(student2.getEmail());
 		userPersistence.removeUser(teacher1.getEmail());
@@ -55,7 +55,7 @@ class UserRepositoryTest {
 	 * @throws UsuariosException 
 	 */
 	@Test
-	void writeUsuarioTest() throws UserException {
+	void writeUsuarioTest() throws UsersException {
 		userPersistence.saveUser(student1);
 		userPersistence.saveUser(teacher1);
 		assertTrue(new File("xml/", student1.getEmail() + ".xml").exists());
@@ -69,7 +69,7 @@ class UserRepositoryTest {
 	 * @throws UsuariosException, IOException
 	 */
 	@Test
-	void readUsuarioTest() throws UserException, IOException  {
+	void readUsuarioTest() throws UsersException, IOException  {
 		userPersistence.saveUser(student1);
 		User u = userPersistence.loadUser(student1.getEmail());
 		assertEquals(student1.getName(), u.getName());
@@ -84,7 +84,7 @@ class UserRepositoryTest {
 	 * @throws UsuariosException 
 	 */
 	@Test
-	void readProfesoresTest() throws UserException {
+	void readProfesoresTest() throws UsersException {
 		userPersistence.saveUser(student1);
 		userPersistence.saveUser(teacher1);
 		userPersistence.saveUser(teacher2);
@@ -112,7 +112,7 @@ class UserRepositoryTest {
 	 * @throws UsuariosException 
 	 */
 	@Test
-	void readEstudiantesTest() throws UserException {
+	void readEstudiantesTest() throws UsersException {
 		userPersistence.saveUser(teacher1);
 		userPersistence.saveUser(student1);
 		userPersistence.saveUser(student2);
@@ -140,7 +140,7 @@ class UserRepositoryTest {
 	 * @throws UsuariosException 
 	 */
 	@Test
-	void removeUsuarioTest() throws UserException {
+	void removeUsuarioTest() throws UsersException {
 		userPersistence.saveUser(student1);
 		userPersistence.saveUser(teacher1);
 		File f1 = new File("xml", student1.getEmail() + ".xml");
@@ -155,7 +155,7 @@ class UserRepositoryTest {
 	 * @throws IOException, UsuariosException 
 	 */
 	@Test
-	void removeUsuariosTest() throws IOException, UserException {
+	void removeUsuariosTest() throws IOException, UsersException {
 		userPersistence.saveUser(student1);
 		userPersistence.saveUser(teacher1);
 		File f1 = new File("xml", student1.getEmail() + ".xml");
