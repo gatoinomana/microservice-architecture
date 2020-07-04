@@ -1,19 +1,29 @@
 using System.Net.Http;
 using System.Text.Json;
-using System.IO;
 using System.Threading.Tasks;
+using System;
 public class UsersServiceFacade
 {
     private readonly IHttpClientFactory _clientFactory;
-    public string UserRole { get; private set; }
-    public bool GetUserRoleError { get; private set; }
-
+    protected class RoleResponse {
+        public string role { get; set; }
+    }
     public UsersServiceFacade(IHttpClientFactory clientFactory)
     {
         _clientFactory = clientFactory;
     }
 
-    public async Task OnGet(string userId)
+    public async Task<bool> IsStudent(string userId) {
+        RoleResponse response = await GetRole(userId);
+        return response.role.Equals("STUDENT");
+    }
+
+    public async Task<bool> IsTeacher(string userId) {
+        RoleResponse role = await GetRole(userId);
+        return role.role.Equals("TEACHER");
+    }
+    
+    private async Task<RoleResponse> GetRole(string userId)
     {
         var request = new HttpRequestMessage(HttpMethod.Get,
             "http://localhost:8080/api/users/" + userId + "/role");
@@ -24,17 +34,12 @@ public class UsersServiceFacade
 
         if (response.IsSuccessStatusCode)
         {
-            using var responseStream = await response.Content.ReadAsStreamAsync();
-            StreamReader reader =  new StreamReader( responseStream );
-            string role = reader.ReadToEnd();
-
-            //JsonSerializer.DeserializeAsync<string>
-            UserRole = role;
+            string jsonString = await response.Content.ReadAsStringAsync();
+            return JsonSerializer.Deserialize<RoleResponse>(jsonString);
         }
         else
         {
-            UserRole = null;
-            GetUserRoleError = true;
-        }
+            return null;
+        } 
     }
 }

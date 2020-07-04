@@ -18,6 +18,6 @@ public class Meeting
     public int TotalSpots { get; set; }
     public int SpotsPerInterval { get; set; }
     public Boolean PublicAttendeeList { get; set; }
-    public List<Interval> Intervals { get; set; }
+    public Interval[] Intervals { get; set; }
     
 }
