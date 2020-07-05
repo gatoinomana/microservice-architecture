@@ -3,9 +3,9 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using MartinezRojo_Noelia_arso_laboratorio_Meetings.Models;
 using MartinezRojo_Noelia_arso_laboratorio_Meetings.Services;
-using Microsoft.Extensions.Options;
 
 namespace MartinezRojo_Noelia_arso_laboratorio_Meetings
 {
@@ -30,7 +30,7 @@ namespace MartinezRojo_Noelia_arso_laboratorio_Meetings
                 sp.GetRequiredService<IOptions<MeetingsDatabaseSettings>>().Value);
             
             services.AddSingleton<MeetingsService>();
-            services.AddSingleton<UsersServiceFacade>();
+            services.AddSingleton<UsersService>();
             services.AddSingleton<MsgQueueService>();
             
             services.AddControllers();

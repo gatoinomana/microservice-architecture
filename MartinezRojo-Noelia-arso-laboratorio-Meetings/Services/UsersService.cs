@@ -2,13 +2,13 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
 using System;
-public class UsersServiceFacade
+public class UsersService
 {
     private readonly IHttpClientFactory _clientFactory;
     protected class RoleResponse {
         public string role { get; set; }
     }
-    public UsersServiceFacade(IHttpClientFactory clientFactory)
+    public UsersService(IHttpClientFactory clientFactory)
     {
         _clientFactory = clientFactory;
     }

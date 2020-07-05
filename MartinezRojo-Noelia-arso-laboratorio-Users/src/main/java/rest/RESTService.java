@@ -58,10 +58,10 @@ public class RESTService {
 	})
 	public Response getAllStudents() throws UsersException {
 		
-		List<User> allStudents = usersController.getAllTeachers();
+		List<User> allStudents = usersController.getAllStudents();
 		
 		JsonObject jsonObject = Json.createObjectBuilder()
-				.add("teachers", jsonArrayFromUserList(allStudents)).build();
+				.add("students", jsonArrayFromUserList(allStudents)).build();
 
 		return Response.status(Response.Status.OK).entity(jsonObject.toString())
 				.type(MediaType.APPLICATION_JSON).build();

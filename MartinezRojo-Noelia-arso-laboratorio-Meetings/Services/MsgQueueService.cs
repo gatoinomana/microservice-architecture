@@ -47,7 +47,7 @@ namespace MartinezRojo_Noelia_arso_laboratorio_Meetings.Services
             var body = Encoding.UTF8.GetBytes(message);
 
             IBasicProperties props = channel.CreateBasicProperties();
-            props.ContentType = "text/plain";
+            props.ContentType = "application/json";
             
             channel.BasicPublish(exchange: "arso-exchange",
                                 routingKey: "arso-queue",

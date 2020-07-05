@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using MartinezRojo_Noelia_arso_laboratorio_Meetings.Services;
-using MongoDB.Bson;
+using System.Text.Json;
 
 namespace MartinezRojo_Noelia_arso_laboratorio_Meetings.Controllers
 {
@@ -13,11 +13,11 @@ namespace MartinezRojo_Noelia_arso_laboratorio_Meetings.Controllers
     public class MeetingsController : ControllerBase
     {
         private readonly MeetingsService _meetingsService;
-        private readonly UsersServiceFacade _usersService;
+        private readonly UsersService _usersService;
         private readonly MsgQueueService _msgQueueService;
 
         public MeetingsController(MeetingsService meetingsService, 
-        UsersServiceFacade usersService, MsgQueueService msgQueueService)
+        UsersService usersService, MsgQueueService msgQueueService)
         {
             _meetingsService = meetingsService;
             _usersService = usersService;
@@ -223,7 +223,11 @@ namespace MartinezRojo_Noelia_arso_laboratorio_Meetings.Controllers
             _meetingsService.Create(meeting);
 
             // Produce event
-            _msgQueueService.ProduceMessage("creada reunion");
+            MeetingToBookEvent _event = new MeetingToBookEvent(
+                "New meeting", meeting.BookingEndTime, meeting.Id);
+
+            string jsonString = JsonSerializer.Serialize(_event);
+            _msgQueueService.ProduceMessage(jsonString);
 
             return CreatedAtAction("GetMeeting", new { id = meeting.Id.ToString() }, meeting);
         }
