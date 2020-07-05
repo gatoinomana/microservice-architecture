@@ -5,21 +5,21 @@ import java.util.List;
 
 import com.coxautodev.graphql.tools.GraphQLRootResolver;
 
-import model.Todo;
-import persistence.TodoRepository;
+import model.Task;
+import persistence.TaskRepository;
 
 public class Query implements GraphQLRootResolver {
 
-	private final TodoRepository todoRepository;
+	private final TaskRepository todoRepository;
 
-	public Query(TodoRepository todoRepository) {
+	public Query(TaskRepository todoRepository) {
 		this.todoRepository = todoRepository;
 	}
 	
-	public List<Todo> allTodosStudent(String studentId) {
-		List<Todo> theirTodos = new ArrayList<Todo>();
+	public List<Task> allTodosStudent(String studentId) {
+		List<Task> theirTodos = new ArrayList<Task>();
 		
-		for (Todo todo : todoRepository.getAllTodos())
+		for (Task todo : todoRepository.getAllTasks())
 			if (todo.getStudentId().equals(studentId))
 				theirTodos.add(todo);
 		

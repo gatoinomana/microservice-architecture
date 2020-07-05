@@ -5,6 +5,12 @@ import java.io.StringReader;
 import java.net.URISyntaxException;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
 
@@ -14,31 +20,67 @@ import javax.json.JsonReader;
 import javax.servlet.annotation.WebServlet;
 
 import com.coxautodev.graphql.tools.SchemaParser;
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
 import com.mongodb.client.MongoDatabase;
 import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.DefaultConsumer;
 import com.rabbitmq.client.Envelope;
+
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 
 import graphql.schema.GraphQLSchema;
 import graphql.servlet.SimpleGraphQLServlet;
-import persistence.TodoRepository;
+import model.Task;
+import persistence.TaskRepository;
 
 @SuppressWarnings("serial")
 @WebServlet(urlPatterns = "/graphql")
 public class GraphQLEndpoint extends SimpleGraphQLServlet {
 
-	private static TodoRepository todoRepository;
+	// MongoDB
+	private static TaskRepository taskRepository;
 	private static MongoClient client;
+	
+	// Rabbit MQ
 	private static Connection msgConnection;
 	private static Channel msgChannel;
-    final static String exchangeName = "arso-exchange";
-    final static String queueName = "arso-queue";
-    final static String routingKey = "arso-queue";
+    final static String EXCHANGE_NAME = "arso-exchange";
+    final static String QUEUE_NAME = "arso-queue";
+    final static String ROUTING_KEY = "arso-queue";
+
+	public GraphQLEndpoint() throws TasksException {
+		super(buildSchema());
+	}
+
+	@Override
+	public void destroy() {
+		super.destroy();
+		client.close();
+	}
+	
+	private static GraphQLSchema buildSchema() throws TasksException {
+
+		initDB();
+		
+		try {
+			initMsgQueue();
+		} catch (Exception e) {
+			throw new TasksException("Couldn't connect to message queue");
+		}
+		
+		createTasksFromQueue();
+
+		return SchemaParser.newParser().file("schema.graphqls")
+		        .resolvers(new Query(taskRepository))
+		        .build().makeExecutableSchema();
+	}
+	
 	
 	private static void initDB() {
 		MongoClientURI uri = new MongoClientURI(
@@ -46,7 +88,7 @@ public class GraphQLEndpoint extends SimpleGraphQLServlet {
 
 		client = new MongoClient(uri);
 	    MongoDatabase mongo = client.getDatabase("arso");
-	    todoRepository = new TodoRepository(mongo.getCollection("todos"));
+	    taskRepository = new TaskRepository(mongo.getCollection("tasks"));
 	}
 
 	private static void initMsgQueue() throws IOException, TimeoutException, 
@@ -61,14 +103,14 @@ public class GraphQLEndpoint extends SimpleGraphQLServlet {
 	   
 	    try {
 	        boolean durable = true;
-	        msgChannel.exchangeDeclare(exchangeName, "direct", durable);
+	        msgChannel.exchangeDeclare(EXCHANGE_NAME, "direct", durable);
 
 	        boolean exclusive = false;
 	        boolean autodelete = false;
 	        Map<String, Object> properties = null; // sin propiedades
-	        msgChannel.queueDeclare(queueName, durable, exclusive, autodelete, properties);    
+	        msgChannel.queueDeclare(QUEUE_NAME, durable, exclusive, autodelete, properties);    
 	        
-	        msgChannel.queueBind(queueName, exchangeName, routingKey);
+	        msgChannel.queueBind(QUEUE_NAME, EXCHANGE_NAME, ROUTING_KEY);
 	    } catch (IOException e) {
 
 	        String mensaje = e.getMessage() == null ? 
@@ -78,59 +120,95 @@ public class GraphQLEndpoint extends SimpleGraphQLServlet {
 	    }
 	}
 	
-	private static void createTodosFromQueue() throws IOException {
+	private static void createTasksFromQueue() throws TasksException {
 		boolean autoAck = false;
-		msgChannel.basicConsume(queueName, autoAck, "arso-consumidor", 
+		try {
+			msgChannel.basicConsume(QUEUE_NAME, autoAck, "arso-consumidor", 
 				new DefaultConsumer(msgChannel) {
-		    @Override
-		    public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties,
-		            byte[] body) throws IOException {
-		        
-		        String routingKey = envelope.getRoutingKey();
-		        String contentType = properties.getContentType();
-		        long deliveryTag = envelope.getDeliveryTag();
+				    @Override
+				    public void handleDelivery(
+				    		String consumerTag, 
+				    		Envelope envelope, 
+				    		AMQP.BasicProperties properties,
+				            byte[] body) throws IOException {
+				        
+				        String routingKey = envelope.getRoutingKey();
+				        String contentType = properties.getContentType();
+				        long deliveryTag = envelope.getDeliveryTag();
+				        
+				        if (!routingKey.equals(ROUTING_KEY) || 
+				        		!contentType.equals("application/json") )
+				        	return;
 
-		        String content = new String(body, "UTF-8");
-//		        Evento evento (Evento) unmarshaller.unmarshal(new StringReader(contenido));
-//		        
-//		        System.out.println("Evento: " + evento.getNombre());
+				        String content = new String(body, "UTF-8");
 
-//		        JsonReader jsonReader = Json.createReader(new StringReader(content));
-//		        JsonObject object = jsonReader.readObject();
+				        JsonReader jsonReader = Json.createReader(
+				        		new StringReader(content.toString()));
+				        JsonObject object = jsonReader.readObject();
+				        
+				        /* If event contains a student's id,
+				         * remove their corresponding pending task,
+				         * else create new task for all students
+				         */
+				        boolean newTask = !object.containsKey("StudentId");
+				        
+						try {
+					        if (newTask)
+					        	createTask(object);
+							else 
+					        	removeTask(object);
+					        
+						} catch (TasksException e) {
+							e.printStackTrace();
+						}
 
-		        // ...
-
-		        // Confirma el procesamiento
-		        msgChannel.basicAck(deliveryTag, false);
-		    }
-		});
+				        // Acknowledge consumed messages
+				        msgChannel.basicAck(deliveryTag, false);
+				    }
+			});
+		} catch (IOException e) {
+			throw new TasksException("Couldn't connect to Users service");
+		}
 	}
 	
-	@Override
-	public void destroy() {
-		super.destroy();
-		client.close();
-	}
-
-	public GraphQLEndpoint() throws KeyManagementException, 
-	NoSuchAlgorithmException, IOException, TimeoutException, URISyntaxException {
-		super(buildSchema());
-	}
-
-	private static GraphQLSchema buildSchema() throws KeyManagementException, 
-	NoSuchAlgorithmException, IOException, TimeoutException, URISyntaxException {
-
-		initDB();
+	private static void removeTask(JsonObject object) {
 		
-		initMsgQueue();
+	}
+	
+	private static void createTask(JsonObject object) throws TasksException {
 		
-		createTodosFromQueue();
-
-		return SchemaParser.newParser().file("schema.graphqls")
-		        .resolvers(
-		            new Query(todoRepository)
-		            )
-		        .build().makeExecutableSchema();
+		// Get all students
+    	List<String> studentIds;
+		try {
+			studentIds = UsersService.getAllStudents();
+		} catch (IOException e) {
+			throw new TasksException("Couldn't get students from Users service");
+		}
+		
+		// Save a task in the database for each student
+    	for(String studentId : studentIds) {
+           
+			DateFormat ISOformat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+			
+			try {
+        		Task newTask = new Task(
+        				studentId,
+		    			object.get("Description")
+		    					.toString().replace("\"", ""),
+		    					
+		    			ISOformat.parse(object.get("Deadline")
+		    					.toString().replace("\"", "")),
+		    			
+		    			object.get("Id").toString().replace("\"", ""),
+		    			object.get("Service").toString().replace("\"", "")
+        		);
+        
+        		taskRepository.save(newTask);
+        		
+			} catch (ParseException e) {
+				throw new TasksException("Couldn't parse date to add to task");
+			}
+    	}
 	}
 
 }
