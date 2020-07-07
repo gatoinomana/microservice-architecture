@@ -1,7 +1,6 @@
 using System;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using System.Collections.Generic;
 public class Meeting
 {
     [BsonId]

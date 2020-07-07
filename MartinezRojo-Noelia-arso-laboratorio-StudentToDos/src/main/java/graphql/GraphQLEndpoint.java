@@ -172,7 +172,11 @@ public class GraphQLEndpoint extends SimpleGraphQLServlet {
 	}
 	
 	private static void removeTask(JsonObject object) {
+		String studentId = object.getString("StudentId").replace("\"", "");
+		String id = object.getString("Id").replace("\"", "");
+		String service = object.getString("Service").replace("\"", "");
 		
+		taskRepository.remove(studentId, id, service);
 	}
 	
 	private static void createTask(JsonObject object) throws TasksException {

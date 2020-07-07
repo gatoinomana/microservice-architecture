@@ -1,3 +1,4 @@
+using System.Security.Principal;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -223,7 +224,7 @@ namespace MartinezRojo_Noelia_arso_laboratorio_Meetings.Controllers
             _meetingsService.Create(meeting);
 
             // Produce event
-            MeetingToBookEvent _event = new MeetingToBookEvent(
+            CreateTaskEvent _event = new CreateTaskEvent(
                 "New meeting", meeting.BookingEndTime, meeting.Id);
 
             string jsonString = JsonSerializer.Serialize(_event);
@@ -265,9 +266,19 @@ namespace MartinezRojo_Noelia_arso_laboratorio_Meetings.Controllers
                 meeting.Organizer.Equals(userId) &&
                 meeting.StartTime > DateTime.Today)
             {
-                
-                _meetingsService.Remove(meeting.Id);
+                // Produce an event for each attendee
+                List<string> studentIds = await _usersService.GetAllStudents();
 
+                studentIds.ForEach( studentId => {
+                    RemoveTaskEvent _event = new RemoveTaskEvent(
+                        studentId, meeting.Id);
+
+                    string jsonString = JsonSerializer.Serialize(_event);
+                    _msgQueueService.ProduceMessage(jsonString);
+                });
+
+                _meetingsService.Remove(meeting.Id);
+                
                 return NoContent();
             }
             else 
@@ -618,7 +629,7 @@ namespace MartinezRojo_Noelia_arso_laboratorio_Meetings.Controllers
             {
                 for(int i = 0; i < interval.Attendees.Length; i++)
                 {
-                    if (interval.Attendees[i] != null && 
+                    if (interval.Attendees[i] != null &&
                     !interval.Attendees[i].StudentId.Equals(userId))
                     {
                         interval.Attendees[i].StudentId = "Hidden attendee";

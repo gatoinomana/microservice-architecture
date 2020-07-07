@@ -113,7 +113,7 @@ public class SurveyRepository {
     	newDocument.put("options", newOptions);
 
     	BasicDBObject updateObject = new BasicDBObject();
-    	updateObject.put("$set", newDocument); //
+    	updateObject.put("$set", newDocument);
 
     	surveys.updateOne(query, updateObject);
 	}
@@ -169,7 +169,6 @@ public class SurveyRepository {
 		return updateResult.getModifiedCount() == 1;
     }
     
-
 	public void remove(String surveyId) {
 		// TODO Auto-generated method stub
 	}

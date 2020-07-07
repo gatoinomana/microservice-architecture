@@ -1,20 +1,25 @@
 package persistence;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.bson.Document;
+import org.bson.types.ObjectId;
 
+import com.mongodb.BasicDBObject;
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.result.DeleteResult;
 
 import model.Task;
 
 public class TaskRepository {
 	
-    private final MongoCollection<Document> todos;
+    private final MongoCollection<Document> tasks;
     
     public TaskRepository(MongoCollection<Document> tasks) {
-        this.todos = tasks;
+        this.tasks = tasks;
     }
 
 	public Task save(Task newTask) {
@@ -24,13 +29,13 @@ public class TaskRepository {
 		doc.append("deadline", newTask.getDeadline());
 		doc.append("id", newTask.getId());
 		doc.append("service", newTask.getService());
-		todos.insertOne(doc);
+		tasks.insertOne(doc);
 		return newTask;
 	}
     
 	public List<Task> getAllTasks() {
 		List<Task> allTodos = new ArrayList<>();
-        for (Document doc : todos.find()) {
+        for (Document doc : tasks.find()) {
         	allTodos.add(task(doc));
         }
         return allTodos;
@@ -43,5 +48,15 @@ public class TaskRepository {
 				 doc.getDate("deadline"),
 				 doc.getString("id"),
 				 doc.getString("service"));
+	}
+	
+	public void remove(String studentId, String id, String service) {
+		// Find task
+		tasks.deleteMany(Filters.and(
+				Filters.eq("studentId", studentId),
+				Filters.eq("id", id), 
+				Filters.eq("service", service)));
+		
+		
 	}
 }
