@@ -223,11 +223,15 @@ namespace MartinezRojo_Noelia_arso_laboratorio_Meetings.Controllers
             // Save meeting to database
             _meetingsService.Create(meeting);
 
-            // Produce event
+            // Publish serialized event
             CreateTaskEvent _event = new CreateTaskEvent(
                 "New meeting", meeting.BookingEndTime, meeting.Id);
 
-            string jsonString = JsonSerializer.Serialize(_event);
+            var options = new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            };
+            string jsonString = JsonSerializer.Serialize(_event, options);
             _msgQueueService.ProduceMessage(jsonString);
 
             return CreatedAtAction("GetMeeting", new { id = meeting.Id.ToString() }, meeting);
@@ -266,14 +270,18 @@ namespace MartinezRojo_Noelia_arso_laboratorio_Meetings.Controllers
                 meeting.Organizer.Equals(userId) &&
                 meeting.StartTime > DateTime.Today)
             {
-                // Produce an event for each attendee
+                // Publish serialized event for each attendee
                 List<string> studentIds = await _usersService.GetAllStudents();
 
                 studentIds.ForEach( studentId => {
                     RemoveTaskEvent _event = new RemoveTaskEvent(
                         studentId, meeting.Id);
 
-                    string jsonString = JsonSerializer.Serialize(_event);
+                    var options = new JsonSerializerOptions
+                    {
+                        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+                    };
+                    string jsonString = JsonSerializer.Serialize(_event, options);
                     _msgQueueService.ProduceMessage(jsonString);
                 });
 
