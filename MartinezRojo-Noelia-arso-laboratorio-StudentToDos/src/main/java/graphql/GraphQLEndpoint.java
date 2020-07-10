@@ -152,15 +152,17 @@ public class GraphQLEndpoint extends SimpleGraphQLServlet {
 				         */
 				        boolean newTask = !object.containsKey("StudentId");
 				        
-						try {
-					        if (newTask)
-					        	createTask(object);
-							else 
-					        	removeTask(object);
-					        
-						} catch (TasksException e) {
-							e.printStackTrace();
-						}
+				        if (newTask)
+							try {
+								createTask(object);
+							} catch (TasksException e) {
+								e.printStackTrace();
+								
+								// Exit to not ack messages
+								System.exit(-1);
+							}
+						else 
+				        	removeTask(object);
 
 				        // Acknowledge consumed messages
 				        msgChannel.basicAck(deliveryTag, false);
@@ -172,9 +174,9 @@ public class GraphQLEndpoint extends SimpleGraphQLServlet {
 	}
 	
 	private static void removeTask(JsonObject object) {
-		String studentId = object.getString("StudentId").replace("\"", "");
-		String id = object.getString("Id").replace("\"", "");
-		String service = object.getString("Service").replace("\"", "");
+		String studentId = object.getString("studentId").replace("\"", "");
+		String id = object.getString("id").replace("\"", "");
+		String service = object.getString("service").replace("\"", "");
 		
 		taskRepository.remove(studentId, id, service);
 	}
@@ -197,14 +199,11 @@ public class GraphQLEndpoint extends SimpleGraphQLServlet {
 			try {
         		Task newTask = new Task(
         				studentId,
-		    			object.get("Description")
-		    					.toString().replace("\"", ""),
-		    					
-		    			ISOformat.parse(object.get("Deadline")
-		    					.toString().replace("\"", "")),
-		    			
-		    			object.get("Id").toString().replace("\"", ""),
-		    			object.get("Service").toString().replace("\"", "")
+		    			object.getString("description"),
+		    			ISOformat.parse(object.get("deadline")
+		    					.toString().replaceAll("\"", "")),
+		    			object.getString("id"),
+		    			object.getString("service")
         		);
         
         		taskRepository.save(newTask);
