@@ -2,16 +2,19 @@ package persistence;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 
-import com.mongodb.BasicDBObject;
+import com.mongodb.MongoClient;
+import com.mongodb.MongoClientURI;
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
 import static com.mongodb.client.model.Updates.*;
 import com.mongodb.client.result.UpdateResult;
@@ -19,25 +22,34 @@ import com.mongodb.client.result.UpdateResult;
 import model.Survey;
 import model.Visibility;
 
-// TODO: las fechas se están guardando mal
 public class SurveyRepository {
 
     private final MongoCollection<Document> surveys;
 	private static SurveyRepository instance;
 	
-	public static SurveyRepository getInstance(MongoCollection<Document> surveys) {
+	public static SurveyRepository getInstance() {
 		if (instance == null)
-			instance = new SurveyRepository(surveys);
+			instance = new SurveyRepository();
 		return instance;
 	}
 
-    private SurveyRepository(MongoCollection<Document> surveys) {
-        this.surveys = surveys;
+    private SurveyRepository() {
+    	
+		// Connect to database
+		MongoClientURI uri = new MongoClientURI(
+			    "mongodb://arso:arso-20@cluster0-shard-00-00-xi0ku.azure.mongodb.net:27017,cluster0-shard-00-01-xi0ku.azure.mongodb.net:27017,cluster0-shard-00-02-xi0ku.azure.mongodb.net:27017/arso?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin&retryWrites=true&w=majority");
+		@SuppressWarnings("resource")
+		MongoDatabase mongo = new MongoClient(uri).getDatabase("arso");
+		
+		// Get survey collection
+        this.surveys = mongo.getCollection("surveys");
     }
 
-    public Survey saveSurvey(Survey survey, String creatorId) {
+    public Survey save(Survey survey) {
+  
         Document doc = new Document();
-        doc.append("creator", creatorId);
+        
+        doc.append("creator", survey.getCreator());
         doc.append("title", survey.getTitle());
         doc.append("instructions", survey.getInstructions());
         doc.append("starts", survey.getStarts());
@@ -45,35 +57,38 @@ public class SurveyRepository {
         doc.append("minOptions", survey.getMinOptions());
         doc.append("maxOptions", survey.getMaxOptions());
         doc.append("visibility", survey.getVisibility().toString());
-        doc.append("options", survey.getOptions());
-        doc.append("results", survey.getResults());
+        doc.append("options", new ArrayList<String>(survey.getOptions()));
+        doc.append("results", new HashMap<String, Boolean>());
+        
         surveys.insertOne(doc);
+        
         return survey(doc);
     }
     
     @SuppressWarnings("unchecked")
 	private Survey survey(Document doc) {
-    	List<String> options = (List<String>) doc.get("options");
-    	Map<String, Integer> results = (Map<String, Integer>) doc.get("results");
-    	Visibility visibility = Visibility.valueOf(doc.getString("visibility"));
-    	
-        return new Survey(      
+    	List<String> optionsAsList = (List<String>) doc.get("options");
+    	Set<String> options = new HashSet<String>(optionsAsList);
+    	return new Survey(      
             doc.get("_id").toString(),
+            doc.getString("creator"),
             doc.getString("title"),
             doc.getString("instructions"),
             doc.getDate("starts"),
             doc.getDate("ends"),
             (int) doc.getInteger("minOptions"),
             (int) doc.getInteger("maxOptions"),
-            visibility, options, results
+            Visibility.valueOf(doc.getString("visibility")),
+            options,
+            (Map<String, Integer>) doc.get("results")
         );
     }
 
-     public Survey findById(String surveyId) {
+    public Survey findById(String surveyId) {
         Document doc = surveys.find(Filters.eq("_id", new ObjectId(surveyId))).first();
         return survey(doc);
     }
-    
+
     public List<Survey> getAllSurveys() {
         List<Survey> allSurveys = new ArrayList<>();
         for (Document doc : surveys.find()) {
@@ -81,47 +96,6 @@ public class SurveyRepository {
         }
         return allSurveys;
     }
-    
-    public void addOption(String surveyId, String text) {
-    	Survey old = findById(surveyId);
-    	
-    	BasicDBObject query = new BasicDBObject();
-    	query.put("options", old.getOptions());
-    	
-    	List<String> newOptions = new LinkedList<String>(old.getOptions());
-    	newOptions.add(text);
-
-    	BasicDBObject newDocument = new BasicDBObject();
-    	newDocument.put("options", newOptions);
-
-    	BasicDBObject updateObject = new BasicDBObject();
-    	updateObject.put("$set", newDocument); //
-
-    	surveys.updateOne(query, updateObject);
-    }
-
-	public void removeOption(String surveyId, String text) {
-    	Survey old = findById(surveyId);
-    	
-    	BasicDBObject query = new BasicDBObject();
-    	query.put("options", old.getOptions());
-    	
-    	List<String> newOptions = new LinkedList<String>(old.getOptions());
-    	newOptions.remove(text);
-
-    	BasicDBObject newDocument = new BasicDBObject();
-    	newDocument.put("options", newOptions);
-
-    	BasicDBObject updateObject = new BasicDBObject();
-    	updateObject.put("$set", newDocument);
-
-    	surveys.updateOne(query, updateObject);
-	}
-	
-	public String findCreatorById(String surveyId) {
-        Document doc = surveys.find(Filters.eq("_id", new ObjectId(surveyId))).first();
-        return doc.getString("creator");
-	}
 	
 	@SuppressWarnings("unchecked")
 	private Map<String, Integer> findResultsById(String surveyId) {
@@ -129,21 +103,35 @@ public class SurveyRepository {
         return (Map<String, Integer>) doc.get("results");
 	}
 	
-    public boolean editBasicInformation(String surveyId, Survey newSurvey) {
+    public boolean editSurvey(String surveyId, Survey patchedSurvey) {
     	
-		Bson surveyToModify = Filters.eq("_id", new ObjectId(surveyId));
-		Bson updateOperation = combine(
-				set("title", newSurvey.getTitle()),
-				set("instructions", newSurvey.getInstructions()),
-				set("starts", newSurvey.getStarts()),
-				set("ends", newSurvey.getEnds()),
-				set("minOptions", newSurvey.getMinOptions()),
-				set("maxOptions", newSurvey.getMaxOptions()),
-				set("visibility", newSurvey.getVisibility().toString())
-		);
-		
-		UpdateResult updateResult = surveys.updateOne(surveyToModify, updateOperation);
-		return updateResult.getModifiedCount() == 1;
+        Document doc = new Document();
+        doc.append("creator", patchedSurvey.getCreator());
+        doc.append("title", patchedSurvey.getTitle());
+        doc.append("instructions", patchedSurvey.getInstructions());
+        doc.append("starts", patchedSurvey.getStarts());
+        doc.append("ends", patchedSurvey.getEnds());
+        doc.append("minOptions", patchedSurvey.getMinOptions());
+        doc.append("maxOptions", patchedSurvey.getMaxOptions());
+        doc.append("visibility", patchedSurvey.getVisibility().toString());
+        doc.append("options", patchedSurvey.getOptions());
+        
+        UpdateResult updateResult = surveys.replaceOne(Filters.eq("_id", new ObjectId(surveyId)), doc);
+        return updateResult.getModifiedCount() == 1;
+        
+//		Bson surveyToModify = Filters.eq("_id", new ObjectId(surveyId));
+//		Bson updateOperation = combine(
+//				set("title", newSurvey.getTitle()),
+//				set("instructions", newSurvey.getInstructions()),
+//				set("starts", newSurvey.getStarts()),
+//				set("ends", newSurvey.getEnds()),
+//				set("minOptions", newSurvey.getMinOptions()),
+//				set("maxOptions", newSurvey.getMaxOptions()),
+//				set("visibility", newSurvey.getVisibility().toString())
+//		);
+//		
+//		UpdateResult updateResult = surveys.updateOne(surveyToModify, updateOperation);
+//		return updateResult.getModifiedCount() == 1;
     }
     
 	public boolean updateResults(String surveyId, Map<String, Boolean> responses) {
@@ -170,6 +158,7 @@ public class SurveyRepository {
     }
     
 	public void remove(String surveyId) {
-		// TODO Auto-generated method stub
+		surveys.findOneAndDelete(
+				Filters.eq("_id", new ObjectId(surveyId)));
 	}
 }

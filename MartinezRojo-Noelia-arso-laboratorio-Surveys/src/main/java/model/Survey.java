@@ -5,20 +5,32 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 public class Survey {
 	
+	private static final String MY_TIME_ZONE = "Europe/Madrid";
+	
 	private String id;
+	private String creator;
 	private String title;
 	private String instructions;
+	
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm", timezone = MY_TIME_ZONE)
 	private Date starts, ends;
 	private int minOptions, maxOptions;
 	private Visibility visibility;
-	private List<String> options;
+	private Set<String> options;
 	private Map<String, Integer> results;
-
-	public Survey(String title, String instructions, Date starts, Date ends, 
-			int minOptions, int maxOptions, Visibility visibility) {
+	
+	public Survey() {}
+	
+	public Survey(String id, String creator, String title, String instructions, Date starts, Date ends,
+			int minOptions, int maxOptions, Visibility visibility, Set<String> options, Map<String, Integer> results) {
+		this.id = id;
+		this.creator = creator;
 		this.title = title;
 		this.instructions = instructions;
 		this.starts = starts;
@@ -26,16 +38,6 @@ public class Survey {
 		this.minOptions = minOptions;
 		this.maxOptions = maxOptions;
 		this.visibility = visibility;
-
-		options = new LinkedList<String>();
-		results = new HashMap<String, Integer>();
-	}
-	
-	public Survey(String id, String title, String instructions, Date starts, 
-			Date ends, int minOptions, int maxOptions, Visibility visibility, 
-			List<String> options, Map<String, Integer> results) {
-		this(title, instructions, starts, ends, minOptions, maxOptions, visibility);
-		this.id = id;
 		this.options = options;
 		this.results = results;
 	}
@@ -46,6 +48,14 @@ public class Survey {
 
 	public void setId(String id) {
 		this.id = id;
+	}
+	
+	public String getCreator() {
+		return creator;
+	}
+
+	public void setCreator(String creator) {
+		this.creator = creator;
 	}
 
 	public String getTitle() {
@@ -104,11 +114,11 @@ public class Survey {
 		this.visibility = visibility;
 	}
 
-	public List<String> getOptions() {
+	public Set<String> getOptions() {
 		return options;
 	}
 
-	public void setOptions(List<String> options) {
+	public void setOptions(Set<String> options) {
 		this.options = options;
 	}
 
@@ -120,18 +130,8 @@ public class Survey {
 		this.results = results;
 	}
 	
-	public void addOption(String text) {
-		options.add(text);
-	}
-	
-	// TODO: da problemas?
-	public void removeOption(String text) {
-		for (String opt : options) {
-			if (opt.equals(text)) {
-				options.remove(opt);
-			}
-		}
-	}
 	// TODO: Operacion modificar porcentaje de una opcion
+
+
 	
 }

@@ -85,19 +85,15 @@
     </dependency>
    	<!-- JSON -->
 	<dependency>
-		<groupId>javax.json</groupId>
-		<artifactId>javax.json-api</artifactId>
-		<version>1.1</version>
-	</dependency>
-	<dependency>
 		<groupId>org.glassfish</groupId>
 		<artifactId>javax.json</artifactId>
 		<version>1.1</version>
 	</dependency>
+	<!-- Jackson @JsonFormat annotation -->
 	<dependency>
-		<groupId>org.apache.geronimo.specs</groupId>
-		<artifactId>geronimo-json_1.1_spec</artifactId>
-		<version>1.0</version>
+	    <groupId>com.fasterxml.jackson.core</groupId>
+	    <artifactId>jackson-databind</artifactId>
+	    <version>2.9.4</version>
 	</dependency>
   </dependencies>
   
