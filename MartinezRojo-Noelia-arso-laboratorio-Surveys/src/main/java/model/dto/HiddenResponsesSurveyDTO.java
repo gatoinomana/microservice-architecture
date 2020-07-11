@@ -1,11 +1,14 @@
-package model;
+package model.dto;
 
 import java.util.Date;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
-public class Survey {
+import model.Survey;
+import model.Visibility;
+
+public class HiddenResponsesSurveyDTO {
 	
 	private static final String MY_TIME_ZONE = "Europe/Madrid";
 	
@@ -18,23 +21,20 @@ public class Survey {
 	private int minOptions, maxOptions;
 	private Visibility visibility;
 	private List<String> options;
-	private List<SurveyResponse> responses;
 	
-	public Survey() {}
-	
-	public Survey(String id, String creator, String title, String instructions, Date starts, Date ends,
-			int minOptions, int maxOptions, Visibility visibility, List<String> options, List<SurveyResponse> responses) {
-		this.id = id;
-		this.creator = creator;
-		this.title = title;
-		this.instructions = instructions;
-		this.starts = starts;
-		this.ends = ends;
-		this.minOptions = minOptions;
-		this.maxOptions = maxOptions;
-		this.visibility = visibility;
-		this.options = options;
-		this.responses = responses;
+	public HiddenResponsesSurveyDTO() {}
+
+	public HiddenResponsesSurveyDTO(Survey s) {
+		this.id = s.getId();
+		this.creator = s.getCreator();
+		this.title = s.getTitle();
+		this.instructions = s.getInstructions();
+		this.starts = s.getStarts();
+		this.ends = s.getEnds();
+		this.minOptions = s.getMinOptions();
+		this.maxOptions = s.getMaxOptions();
+		this.visibility = s.getVisibility();
+		this.options = s.getOptions();
 	}
 
 	public String getId() {
@@ -115,13 +115,5 @@ public class Survey {
 
 	public void setOptions(List<String> options) {
 		this.options = options;
-	}
-
-	public List<SurveyResponse> getResponses() {
-		return responses;
-	}
-
-	public void setResponses(List<SurveyResponse> responses) {
-		this.responses = responses;
 	}
 }

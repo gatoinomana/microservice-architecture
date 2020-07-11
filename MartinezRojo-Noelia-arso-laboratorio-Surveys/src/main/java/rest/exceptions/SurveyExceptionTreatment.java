@@ -1,10 +1,10 @@
-package rest;
+package rest.exceptions;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
-import controller.SurveyException;
+import rest.exceptions.SurveyException;
 
 @Provider
 public class SurveyExceptionTreatment

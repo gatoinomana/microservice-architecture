@@ -1,4 +1,4 @@
-package rest;
+package rest.patch;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

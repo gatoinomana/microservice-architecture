@@ -1,4 +1,4 @@
-package rest;
+package rest.exceptions;
 
 @SuppressWarnings("serial")
 public class ForbiddenException extends Exception {

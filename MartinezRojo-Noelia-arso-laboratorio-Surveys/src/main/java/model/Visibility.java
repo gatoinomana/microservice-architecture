@@ -1,5 +1,5 @@
 package model;
 
 public enum Visibility {
-	ALWAYS, VOTERS_ONLY, ONCE_CLOSED, NEVER;
+	ALWAYS, PARTICIPANTS_ONLY, ONCE_CLOSED, NEVER;
 }

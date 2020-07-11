@@ -1,4 +1,4 @@
-package controller;
+package rest.exceptions;
 
 @SuppressWarnings("serial")
 public class SurveyException extends Exception {

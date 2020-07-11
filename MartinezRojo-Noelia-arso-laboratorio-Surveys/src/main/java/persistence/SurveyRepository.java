@@ -1,30 +1,26 @@
 package persistence;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import org.bson.Document;
-import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 
+import com.mongodb.BasicDBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
-import static com.mongodb.client.model.Updates.*;
-import com.mongodb.client.result.UpdateResult;
 
 import model.Survey;
+import model.SurveyResponse;
 import model.Visibility;
 
 public class SurveyRepository {
 
     private final MongoCollection<Document> surveys;
+    private final MongoCollection<Document> responses;
 	private static SurveyRepository instance;
 	
 	public static SurveyRepository getInstance() {
@@ -43,6 +39,7 @@ public class SurveyRepository {
 		
 		// Get survey collection
         this.surveys = mongo.getCollection("surveys");
+        this.responses = mongo.getCollection("responses");
     }
 
     public Survey save(Survey survey) {
@@ -58,16 +55,43 @@ public class SurveyRepository {
         doc.append("maxOptions", survey.getMaxOptions());
         doc.append("visibility", survey.getVisibility().toString());
         doc.append("options", survey.getOptions());
-        doc.append("results", new HashMap<String, Boolean>());
+        doc.append("responses", new ArrayList<SurveyResponse>());
         
         surveys.insertOne(doc);
         
         return survey(doc);
     }
     
+	public void saveResponse(String surveyId, SurveyResponse response) {
+        
+		// Save response
+		Document doc = new Document();
+        
+        doc.append("student", response.getStudent());
+        doc.append("selectedOptions", response.getSelectedOptions());
+        
+        responses.insertOne(doc);
+        
+        // Save reference in survey
+        surveys.updateOne(
+        		Filters.eq("_id", new ObjectId(surveyId)), 
+        		new Document("$push",  new BasicDBObject(
+        				"responses", response(doc).getId())));
+	}
+    
     @SuppressWarnings("unchecked")
 	private Survey survey(Document doc) {
     	
+    	// Get List<SurveyResult> from document references
+    	List<SurveyResponse> responses = new ArrayList<SurveyResponse>();
+    	List<String> responsesIds = (List<String>) doc.get("responses");
+    	
+    	for(String id : responsesIds) {
+    		SurveyResponse response = getResponse(id);
+    		if (response != null)
+    			responses.add(response);
+    	}
+
     	return new Survey(      
             doc.get("_id").toString(),
             doc.getString("creator"),
@@ -79,14 +103,44 @@ public class SurveyRepository {
             (int) doc.getInteger("maxOptions"),
             Visibility.valueOf(doc.getString("visibility")),
             (List<String>) doc.get("options"),
-            (Map<String, Integer>) doc.get("results")
+            responses
         );
     }
 
-    public Survey findById(String surveyId) {
-        Document doc = surveys.find(Filters.eq("_id", new ObjectId(surveyId))).first();
-        return survey(doc);
+	@SuppressWarnings("unchecked")
+	private SurveyResponse response(Document doc) {
+    	
+    	return new SurveyResponse(      
+            doc.get("_id").toString(),
+            doc.getString("student"),
+            (List<String>) doc.get("selectedOptions")
+        );
     }
+
+    public Survey getSurvey(String surveyId) {
+    	
+        Document doc = surveys.find(Filters.eq("_id", 
+        		new ObjectId(surveyId))).first();
+        
+        if (doc != null) {
+        	return survey(doc);
+        }
+        	
+        return null;
+    }
+    
+    
+    private SurveyResponse getResponse(String responseId) {
+    	
+        Document doc = responses.find(Filters.eq("_id", 
+        		new ObjectId(responseId))).first();
+        
+        if (doc != null) {
+        	return response(doc);
+        }
+        	
+        return null;
+	}
 
     public List<Survey> getAllSurveys() {
         List<Survey> allSurveys = new ArrayList<>();
@@ -95,14 +149,8 @@ public class SurveyRepository {
         }
         return allSurveys;
     }
-	
-	@SuppressWarnings("unchecked")
-	private Map<String, Integer> findResultsById(String surveyId) {
-        Document doc = surveys.find(Filters.eq("_id", new ObjectId(surveyId))).first();
-        return (Map<String, Integer>) doc.get("results");
-	}
-	
-    public void editSurvey(String surveyId, Survey patchedSurvey) {
+
+    public void edit(String surveyId, Survey patchedSurvey) {
     	
         Document doc = new Document();
         
@@ -115,36 +163,14 @@ public class SurveyRepository {
         doc.append("maxOptions", patchedSurvey.getMaxOptions());
         doc.append("visibility", patchedSurvey.getVisibility().toString());
         doc.append("options", patchedSurvey.getOptions());
-        doc.append("options", patchedSurvey.getResults());
+        doc.append("responses", patchedSurvey.getResponses());
         
         surveys.replaceOne(Filters.eq("_id", new ObjectId(surveyId)), doc);
-    }
-    
-	public boolean updateResults(String surveyId, Map<String, Boolean> responses) {
-    	
-    	Map<String, Integer> oldResults = findResultsById(surveyId);
-    	Map<String, Integer> newResults = new HashMap<String, Integer>();
-    	
-    	/* Por cada opción asociada a "true" en "respones"
-    	 * incrementar en 1 el número de votos asociado en "results"
-    	 * */
-    	for(String option : oldResults.keySet()) {
-    		int oldVotes = oldResults.get(option);
-    		if (responses.get(option))
-    			newResults.put(option, oldVotes + 1);
-    		else
-    			newResults.put(option, oldVotes);
-    	}
-    	
-		Bson surveyToModify = Filters.eq("_id", new ObjectId(surveyId));
-		Bson updateOperation = set("results", newResults);
-		
-		UpdateResult updateResult = surveys.updateOne(surveyToModify, updateOperation);
-		return updateResult.getModifiedCount() == 1;
     }
     
 	public void remove(String surveyId) {
 		surveys.findOneAndDelete(
 				Filters.eq("_id", new ObjectId(surveyId)));
 	}
+   
 }

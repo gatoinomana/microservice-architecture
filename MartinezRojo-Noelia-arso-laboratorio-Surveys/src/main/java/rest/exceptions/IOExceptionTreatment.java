@@ -1,4 +1,4 @@
-package rest;
+package rest.exceptions;
 
 import java.io.IOException;
 
