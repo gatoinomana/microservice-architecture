@@ -22,13 +22,13 @@ public class Survey {
 	private Date starts, ends;
 	private int minOptions, maxOptions;
 	private Visibility visibility;
-	private Set<String> options;
+	private List<String> options;
 	private Map<String, Integer> results;
 	
 	public Survey() {}
 	
 	public Survey(String id, String creator, String title, String instructions, Date starts, Date ends,
-			int minOptions, int maxOptions, Visibility visibility, Set<String> options, Map<String, Integer> results) {
+			int minOptions, int maxOptions, Visibility visibility, List<String> options, Map<String, Integer> results) {
 		this.id = id;
 		this.creator = creator;
 		this.title = title;
@@ -114,11 +114,11 @@ public class Survey {
 		this.visibility = visibility;
 	}
 
-	public Set<String> getOptions() {
+	public List<String> getOptions() {
 		return options;
 	}
 
-	public void setOptions(Set<String> options) {
+	public void setOptions(List<String> options) {
 		this.options = options;
 	}
 

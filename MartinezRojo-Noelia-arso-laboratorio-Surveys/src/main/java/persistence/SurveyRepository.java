@@ -57,7 +57,7 @@ public class SurveyRepository {
         doc.append("minOptions", survey.getMinOptions());
         doc.append("maxOptions", survey.getMaxOptions());
         doc.append("visibility", survey.getVisibility().toString());
-        doc.append("options", new ArrayList<String>(survey.getOptions()));
+        doc.append("options", survey.getOptions());
         doc.append("results", new HashMap<String, Boolean>());
         
         surveys.insertOne(doc);
@@ -67,8 +67,7 @@ public class SurveyRepository {
     
     @SuppressWarnings("unchecked")
 	private Survey survey(Document doc) {
-    	List<String> optionsAsList = (List<String>) doc.get("options");
-    	Set<String> options = new HashSet<String>(optionsAsList);
+    	
     	return new Survey(      
             doc.get("_id").toString(),
             doc.getString("creator"),
@@ -79,7 +78,7 @@ public class SurveyRepository {
             (int) doc.getInteger("minOptions"),
             (int) doc.getInteger("maxOptions"),
             Visibility.valueOf(doc.getString("visibility")),
-            options,
+            (List<String>) doc.get("options"),
             (Map<String, Integer>) doc.get("results")
         );
     }
@@ -103,9 +102,10 @@ public class SurveyRepository {
         return (Map<String, Integer>) doc.get("results");
 	}
 	
-    public boolean editSurvey(String surveyId, Survey patchedSurvey) {
+    public void editSurvey(String surveyId, Survey patchedSurvey) {
     	
         Document doc = new Document();
+        
         doc.append("creator", patchedSurvey.getCreator());
         doc.append("title", patchedSurvey.getTitle());
         doc.append("instructions", patchedSurvey.getInstructions());
@@ -115,23 +115,9 @@ public class SurveyRepository {
         doc.append("maxOptions", patchedSurvey.getMaxOptions());
         doc.append("visibility", patchedSurvey.getVisibility().toString());
         doc.append("options", patchedSurvey.getOptions());
+        doc.append("options", patchedSurvey.getResults());
         
-        UpdateResult updateResult = surveys.replaceOne(Filters.eq("_id", new ObjectId(surveyId)), doc);
-        return updateResult.getModifiedCount() == 1;
-        
-//		Bson surveyToModify = Filters.eq("_id", new ObjectId(surveyId));
-//		Bson updateOperation = combine(
-//				set("title", newSurvey.getTitle()),
-//				set("instructions", newSurvey.getInstructions()),
-//				set("starts", newSurvey.getStarts()),
-//				set("ends", newSurvey.getEnds()),
-//				set("minOptions", newSurvey.getMinOptions()),
-//				set("maxOptions", newSurvey.getMaxOptions()),
-//				set("visibility", newSurvey.getVisibility().toString())
-//		);
-//		
-//		UpdateResult updateResult = surveys.updateOne(surveyToModify, updateOperation);
-//		return updateResult.getModifiedCount() == 1;
+        surveys.replaceOne(Filters.eq("_id", new ObjectId(surveyId)), doc);
     }
     
 	public boolean updateResults(String surveyId, Map<String, Boolean> responses) {

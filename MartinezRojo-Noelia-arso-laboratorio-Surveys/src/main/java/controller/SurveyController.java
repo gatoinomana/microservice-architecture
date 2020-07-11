@@ -2,7 +2,9 @@ package controller;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -62,6 +64,10 @@ public class SurveyController {
 			throw new ForbiddenException(
 					"The 'userId' parameter must match the survey's 'creator'");	
 		}
+		
+		// Remove duplicate options
+		List<String> options = survey.getOptions();
+		survey.setOptions(new ArrayList<>(new HashSet<>(options)));
 		
 		// Check preconditions
 		if (!isValid(survey)) {
@@ -125,6 +131,8 @@ public class SurveyController {
 		
 		// Students may or may not be able to see the survey's results
 		// (check visibility)
+		
+		//TODO
 		
 		return surveyRepository.findById(surveyId);
 	}
