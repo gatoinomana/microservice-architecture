@@ -29,6 +29,9 @@ namespace MartinezRojo_Noelia_arso_laboratorio_Meetings.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpPost]
         public async Task<ActionResult<Meeting>> PostMeeting(Meeting meeting, [FromQuery] string userId)
         {
@@ -116,7 +119,11 @@ namespace MartinezRojo_Noelia_arso_laboratorio_Meetings.Controllers
 
             return CreatedAtAction("GetMeeting", new { id = meeting.Id.ToString() }, meeting);
         }
-        
+
+        [ProducesResponseType(StatusCodes.Status204NoContent)]   
+        [ProducesResponseType(StatusCodes.Status404NotFound)]        
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         // DELETE: api/Meetings/5
         [HttpDelete("{id:length(24)}")]
         public async Task<IActionResult> DeleteMeeting(string id, [FromQuery] string userId)
@@ -166,6 +173,10 @@ namespace MartinezRojo_Noelia_arso_laboratorio_Meetings.Controllers
             return NoContent();
         }
         
+        [ProducesResponseType(StatusCodes.Status204NoContent)]   
+        [ProducesResponseType(StatusCodes.Status404NotFound)]        
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         // DELETE: api/Meetings
         [HttpDelete]
         public async Task<IActionResult> DeleteMeetings([FromQuery] string userId)
@@ -229,6 +240,10 @@ namespace MartinezRojo_Noelia_arso_laboratorio_Meetings.Controllers
             return NoContent();
         }
 
+        [ProducesResponseType(StatusCodes.Status200OK)]   
+        [ProducesResponseType(StatusCodes.Status404NotFound)]        
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         // For use cases AddAttendee (as teacher) and JoinMeeting (as student)
         [HttpPatch("{id:length(24)}/add-attendee")]
         public async Task<ActionResult<Meeting>> AddAttendee(
@@ -360,6 +375,10 @@ namespace MartinezRojo_Noelia_arso_laboratorio_Meetings.Controllers
             return Ok(meeting);
         }
 
+        [ProducesResponseType(StatusCodes.Status200OK)]   
+        [ProducesResponseType(StatusCodes.Status404NotFound)]        
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [HttpPatch("{id:length(24)}/remove-attendee")]
         public ActionResult<Meeting> RemoveAttendee(
             string id, [FromQuery] string userId, BookingDTO dto)
@@ -408,6 +427,10 @@ namespace MartinezRojo_Noelia_arso_laboratorio_Meetings.Controllers
             return Ok(meeting);
         }
 
+        [ProducesResponseType(StatusCodes.Status200OK)]      
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]     
         // GET: api/Meetings
         [HttpGet]
         public async Task<ActionResult<List<Meeting>>> GetMeetings([FromQuery] string userId)
@@ -458,7 +481,12 @@ namespace MartinezRojo_Noelia_arso_laboratorio_Meetings.Controllers
                 return StatusCode(403, "Only registered teachers and students can see meetings");
             }
         }
-            
+        
+        [ProducesResponseType(StatusCodes.Status200OK)]      
+        [ProducesResponseType(StatusCodes.Status404NotFound)]      
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]     
         // GET: api/Meetings/5
         [HttpGet("{id:length(24)}", Name = "GetMeeting")]
         public async Task<ActionResult<Meeting>> GetMeeting(string id, [FromQuery] string userId)
