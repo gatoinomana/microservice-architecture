@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using MartinezRojo_Noelia_arso_laboratorio_Meetings.Services;
 using System.Text.Json;
+using Microsoft.AspNetCore.Http;
 
 namespace MartinezRojo_Noelia_arso_laboratorio_Meetings.Controllers
 {
@@ -27,6 +28,7 @@ namespace MartinezRojo_Noelia_arso_laboratorio_Meetings.Controllers
         // POST: api/Meetings
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
+        [ProducesResponseType(StatusCodes.Status201Created)]
         [HttpPost]
         public async Task<ActionResult<Meeting>> PostMeeting(Meeting meeting, [FromQuery] string userId)
         {

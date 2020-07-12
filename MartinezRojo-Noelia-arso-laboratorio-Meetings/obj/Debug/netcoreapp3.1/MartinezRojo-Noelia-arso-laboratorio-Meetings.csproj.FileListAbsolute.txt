@@ -135,3 +135,14 @@
 /Users/noe/git/repository/MartinezRojo-Noelia-arso-laboratorio-Meetings/bin/Debug/netcoreapp3.1/Newtonsoft.Json.Bson.dll
 /Users/noe/git/repository/MartinezRojo-Noelia-arso-laboratorio-Meetings/bin/Debug/netcoreapp3.1/SharpCompress.dll
 /Users/noe/git/repository/MartinezRojo-Noelia-arso-laboratorio-Meetings/bin/Debug/netcoreapp3.1/RabbitMQ.Client.dll
+/Users/noe/git/repository/MartinezRojo-Noelia-arso-laboratorio-Meetings/bin/Debug/netcoreapp3.1/Microsoft.DotNet.InternalAbstractions.dll
+/Users/noe/git/repository/MartinezRojo-Noelia-arso-laboratorio-Meetings/bin/Debug/netcoreapp3.1/Microsoft.Extensions.DependencyModel.dll
+/Users/noe/git/repository/MartinezRojo-Noelia-arso-laboratorio-Meetings/bin/Debug/netcoreapp3.1/Microsoft.Extensions.PlatformAbstractions.dll
+/Users/noe/git/repository/MartinezRojo-Noelia-arso-laboratorio-Meetings/bin/Debug/netcoreapp3.1/Namotion.Reflection.dll
+/Users/noe/git/repository/MartinezRojo-Noelia-arso-laboratorio-Meetings/bin/Debug/netcoreapp3.1/NJsonSchema.dll
+/Users/noe/git/repository/MartinezRojo-Noelia-arso-laboratorio-Meetings/bin/Debug/netcoreapp3.1/NSwag.Annotations.dll
+/Users/noe/git/repository/MartinezRojo-Noelia-arso-laboratorio-Meetings/bin/Debug/netcoreapp3.1/NSwag.AspNetCore.dll
+/Users/noe/git/repository/MartinezRojo-Noelia-arso-laboratorio-Meetings/bin/Debug/netcoreapp3.1/NSwag.Core.dll
+/Users/noe/git/repository/MartinezRojo-Noelia-arso-laboratorio-Meetings/bin/Debug/netcoreapp3.1/NSwag.Generation.dll
+/Users/noe/git/repository/MartinezRojo-Noelia-arso-laboratorio-Meetings/bin/Debug/netcoreapp3.1/NSwag.Generation.AspNetCore.dll
+/Users/noe/git/repository/MartinezRojo-Noelia-arso-laboratorio-Meetings/obj/Debug/netcoreapp3.1/MartinezRojo-Noelia-arso-laboratorio-Meetings.MvcApplicationPartsAssemblyInfo.cs

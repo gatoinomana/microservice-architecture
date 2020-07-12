@@ -23,15 +23,24 @@ namespace MartinezRojo_Noelia_arso_laboratorio_Meetings
         {
             services.AddHttpClient();
 
+            // Database settings
             services.Configure<MeetingsDatabaseSettings>(
                 Configuration.GetSection(nameof(MeetingsDatabaseSettings)));
 
             services.AddSingleton<IMeetingsDatabaseSettings>(sp =>
                 sp.GetRequiredService<IOptions<MeetingsDatabaseSettings>>().Value);
             
+            // Service to communicate with database
             services.AddSingleton<MeetingsService>();
+
+            // Service to communicate with Users microservice
             services.AddSingleton<UsersService>();
+
+            // Service to communique with RabbitMQ queue
             services.AddSingleton<MsgQueueService>();
+
+            // Register the Swagger services
+            services.AddSwaggerDocument();
             
             services.AddControllers();
         }
@@ -54,6 +63,10 @@ namespace MartinezRojo_Noelia_arso_laboratorio_Meetings
             {
                 endpoints.MapControllers();
             });
+
+            // Register the Swagger generator and the Swagger UI middlewares
+            app.UseOpenApi();
+            app.UseSwaggerUi3();
         }
     }
 }
