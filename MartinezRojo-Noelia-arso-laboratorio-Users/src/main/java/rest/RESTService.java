@@ -18,6 +18,7 @@ import controller.UsersController;
 import controller.UsersException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import model.Role;
@@ -32,10 +33,12 @@ public class RESTService {
 	@GET
 	@Path("/teachers")
 	@Produces(MediaType.APPLICATION_JSON)
-	@ApiOperation(value = "Returns a JSON document with an array of all users with the role \"TEACHER\"")
+	@ApiOperation(	value = "Returns a list of all users with the role \"TEACHER\"",
+					notes = "Each user is returned as a JSON Object",
+					response = List.class)
 	@ApiResponses(value = { 
-		@ApiResponse(code = HttpServletResponse.SC_OK, message = ""),
-		@ApiResponse(code = HttpServletResponse.SC_INTERNAL_SERVER_ERROR, message = "")
+		@ApiResponse(code = HttpServletResponse.SC_OK, message = "Teachers returned"),
+		@ApiResponse(code = HttpServletResponse.SC_INTERNAL_SERVER_ERROR, message = "Some exception occurred")
 	})
 	public Response getAllTeachers() throws UsersException {
 		
@@ -51,10 +54,12 @@ public class RESTService {
 	@GET
 	@Path("/students")
 	@Produces(MediaType.APPLICATION_JSON)
-	@ApiOperation(value = "Returns a JSON document with an array of all users with the role \"STUDENT\"")
+	@ApiOperation(	value = "Returns a list of all users with the role \"STUDENT\"",
+					notes = "Each user is returned as a JSON Object",
+					response = List.class)
 	@ApiResponses(value = { 
-		@ApiResponse(code = HttpServletResponse.SC_OK, message = ""),
-		@ApiResponse(code = HttpServletResponse.SC_INTERNAL_SERVER_ERROR, message = "")
+		@ApiResponse(code = HttpServletResponse.SC_OK, message = "Students returned"),
+		@ApiResponse(code = HttpServletResponse.SC_INTERNAL_SERVER_ERROR, message = "Some exception occurred")
 	})
 	public Response getAllStudents() throws UsersException {
 		
@@ -71,13 +76,16 @@ public class RESTService {
 	@GET
 	@Path("/{id}/role")
 	@Produces(MediaType.APPLICATION_JSON)
-	@ApiOperation(value = "Returns a JSON document with the role of a user, given their id")
+	@ApiOperation(	value = "Returns role of a user, given their id", 
+					notes = "Response is a JSON Object with a field 'role'")
 	@ApiResponses(value = { 
-		@ApiResponse(code = HttpServletResponse.SC_OK, message = ""),
-		@ApiResponse(code = HttpServletResponse.SC_NOT_FOUND, message = "The id does not belong to an existing user"), 
-		@ApiResponse(code = HttpServletResponse.SC_INTERNAL_SERVER_ERROR, message = "")
+		@ApiResponse(code = HttpServletResponse.SC_OK, message = "Role returned"),
+		@ApiResponse(code = HttpServletResponse.SC_NOT_FOUND, message = "No user with that id"), 
+		@ApiResponse(code = HttpServletResponse.SC_INTERNAL_SERVER_ERROR, message = "Some exception occurred")
 	})
-	public Response getRole(@PathParam("id") String id) throws UsersException {
+	public Response getRole(
+			@ApiParam(value = "Id of user", required = true) 
+			@PathParam("id") String id) throws UsersException {
 		
 		Role role = usersController.getRole(id);
 		

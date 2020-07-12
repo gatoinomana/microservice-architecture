@@ -1,6 +1,9 @@
 package rest;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+
 import rest.exceptions.*;
 import rest.patch.JsonPatchDTO;
 import rest.patch.OperationDTO;
@@ -11,6 +14,7 @@ import javax.json.JsonArray;
 import javax.json.JsonArrayBuilder;
 import javax.json.JsonObjectBuilder;
 import javax.json.JsonPatch;
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -23,7 +27,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import controller.SurveyController;
-import io.swagger.annotations.Api;
+import io.swagger.annotations.*;
 import model.Survey;
 import model.SurveyResponse;
 
@@ -40,8 +44,24 @@ public class RESTService {
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
+	@ApiOperation(	value = "Creates a survey", 
+					notes = "Returns the created survey, including its id", 
+					response = Survey.class) 
+	@ApiResponses(value = {
+			@ApiResponse(	code = HttpServletResponse.SC_CREATED, 
+							message ="Survey created"),
+			@ApiResponse(	code = HttpServletResponse.SC_BAD_REQUEST, 
+							message ="Missing userId query parameter, invalid field values or trying to set responses"),
+			@ApiResponse(	code = HttpServletResponse.SC_FORBIDDEN, 
+							message ="User is not a teacher, or doesn't match creator field, or already has a non-past survey with the same title"),
+			@ApiResponse(	code = HttpServletResponse.SC_INTERNAL_SERVER_ERROR, 
+							message ="Some exception occured"),
+	})
 	public Response createSurvey(
-			Survey survey, @QueryParam("userId") String userId) 
+			@ApiParam(value = "Survey", required = true) Survey survey, 
+			
+			@ApiParam(value = "Id of user performing request", required = true) 
+			@QueryParam("userId") String userId) 
 	
 				throws ForbiddenException, IOException, 
 					IllegalArgumentException, SurveyException {
@@ -66,8 +86,27 @@ public class RESTService {
 	@Path("/{id}")
 	@Produces(MediaType.APPLICATION_JSON) 
 	@Consumes(MediaType.APPLICATION_JSON)
+	@ApiOperation(	value = "Edits a survey", 
+					notes = "Returns the edited survey", 
+					response = Survey.class) 
+	@ApiResponses(value = {
+		@ApiResponse(	code = HttpServletResponse.SC_OK, 
+						message ="Survey edited"),
+		@ApiResponse(	code = HttpServletResponse.SC_NOT_FOUND, 
+						message ="No survey with that id"),
+		@ApiResponse(	code = HttpServletResponse.SC_BAD_REQUEST, 
+						message ="Missing userId query parameter, incorrect JSON Patch format, invalid value fields or trying to set responses"),
+		@ApiResponse(	code = HttpServletResponse.SC_FORBIDDEN, 
+						message ="User is not the creator or it is not a future survey"),
+		@ApiResponse(	code = HttpServletResponse.SC_INTERNAL_SERVER_ERROR, 
+						message ="Some exception occured"),
+	})
 	public Response editSurvey(JsonPatchDTO patchDTO, 
-			@PathParam("id") String surveyId, @QueryParam("userId") String userId) 
+			@ApiParam(value = "Survey id", required = true)
+			@PathParam("id") String surveyId, 
+			
+			@ApiParam(value = "Id of user performing request", required = true) 
+			@QueryParam("userId") String userId) 
 	
 				throws SurveyException, ForbiddenException, 
 					IOException, ResourceNotFoundException {
@@ -104,7 +143,22 @@ public class RESTService {
 	@Path("/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response removeSurvey(@PathParam("id") String surveyId, 
+	@ApiOperation(	value = "Removes a survey" )
+	@ApiResponses(value = {
+			@ApiResponse(	code = HttpServletResponse.SC_NO_CONTENT, 
+							message ="Survey removed"),
+			@ApiResponse(	code = HttpServletResponse.SC_NOT_FOUND, 
+							message ="No survey with that id"),
+			@ApiResponse(	code = HttpServletResponse.SC_BAD_REQUEST, 
+							message ="Missing userId query parameter"),
+			@ApiResponse(	code = HttpServletResponse.SC_FORBIDDEN, 
+							message ="User is not the creator or it is a past survey"),
+	})
+	public Response removeSurvey(
+			@ApiParam(value = "Survey id", required = true)
+			@PathParam("id") String surveyId, 
+			
+			@ApiParam(value = "Id of user performing request", required = true)
 			@QueryParam("userId") String userId) 
 	
 				throws SurveyException, ForbiddenException, ResourceNotFoundException {
@@ -121,7 +175,21 @@ public class RESTService {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response getAllSurveys(@QueryParam("userId") String userId) 
+	@ApiOperation(	value = "Gets all surveys",
+					response = List.class) 
+	@ApiResponses(value = {
+		@ApiResponse(	code = HttpServletResponse.SC_OK, 
+						message ="Surveys returned"),
+		@ApiResponse(	code = HttpServletResponse.SC_BAD_REQUEST, 
+						message ="Missing userId query parameter"),
+		@ApiResponse(	code = HttpServletResponse.SC_FORBIDDEN, 
+						message ="User is neither a teacher nor a student"),
+		@ApiResponse(	code = HttpServletResponse.SC_INTERNAL_SERVER_ERROR, 
+						message ="Some exception occurred"),
+	})
+	public Response getAllSurveys(
+			@ApiParam(value = "Id of user performing request", required = true)
+			@QueryParam("userId") String userId) 
 	
 			throws IOException, ForbiddenException, SurveyException {
 		
@@ -141,8 +209,26 @@ public class RESTService {
 	@Path("/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
+	@ApiOperation(	value = "Gets a survey by id",
+					response = Survey.class) 
+	@ApiResponses(value = {
+		@ApiResponse(	code = HttpServletResponse.SC_OK, 
+						message ="Survey returned"),
+		@ApiResponse(	code = HttpServletResponse.SC_NOT_FOUND, 
+						message ="No survey with that id"),
+		@ApiResponse(	code = HttpServletResponse.SC_BAD_REQUEST, 
+						message ="Missing userId query parameter"),
+		@ApiResponse(	code = HttpServletResponse.SC_FORBIDDEN, 
+						message ="User is a teacher but not the creator, or is a student but it is a future survey, or it is neither"),
+		@ApiResponse(	code = HttpServletResponse.SC_INTERNAL_SERVER_ERROR, 
+						message ="Some exception occurred"),
+	})
 	public Response getSurvey(
-			@PathParam("id") String surveyId, @QueryParam("userId") String userId) 
+			@ApiParam(value = "Survey id", required = true)
+			@PathParam("id") String surveyId, 
+			
+			@ApiParam(value = "Id of user performing request", required = true)
+			@QueryParam("userId") String userId) 
 	
 				throws ResourceNotFoundException, ForbiddenException, IOException {
 		
@@ -161,8 +247,28 @@ public class RESTService {
 	@PATCH
 	@Path("/{id}/responses")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response fillSurvey(SurveyResponse response, 
-			@PathParam("id") String surveyId, @QueryParam("userId") String userId) 
+	@ApiOperation(	value = "Adds a response to a Survey" ) 
+	@ApiResponses(value = {
+		@ApiResponse(	code = HttpServletResponse.SC_OK, 
+						message ="Response added"),
+		@ApiResponse(	code = HttpServletResponse.SC_NOT_FOUND, 
+						message ="No survey with that id"),
+		@ApiResponse(	code = HttpServletResponse.SC_BAD_REQUEST, 
+						message ="Missing userId query parameter, some option doesn't exist or didn't satisfy minimum or maximum number of selected options"),
+		@ApiResponse(	code = HttpServletResponse.SC_FORBIDDEN, 
+						message ="User is not a student, or doesn't match student field, or as already filled this survey, or survey is not open"),
+		@ApiResponse(	code = HttpServletResponse.SC_INTERNAL_SERVER_ERROR, 
+						message ="Some exception occurred"),
+	})
+	public Response fillSurvey(
+			@ApiParam(value = "SurveyResponse", required = true) 
+			SurveyResponse response,
+			
+			@ApiParam(value = "Survey id", required = true)
+			@PathParam("id") String surveyId, 
+			
+			@ApiParam(value = "Id of user performing request", required = true) 
+			@QueryParam("userId") String userId) 
 	
 				throws SurveyException, ForbiddenException, 
 					IOException, ResourceNotFoundException {
@@ -183,8 +289,26 @@ public class RESTService {
 	@Path("/{id}/results")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
+	@ApiOperation(	value = "Gets the results of a Survey", 
+					notes = "Returns the % of votes per option as a map",
+					response = Map.class ) 
+	@ApiResponses(value = {
+		@ApiResponse(	code = HttpServletResponse.SC_OK, 
+						message ="Results returned"),
+		@ApiResponse(	code = HttpServletResponse.SC_NOT_FOUND, 
+						message ="No survey with that id"),
+		@ApiResponse(	code = HttpServletResponse.SC_BAD_REQUEST, 
+						message ="Missing userId query parameter"),
+		@ApiResponse(	code = HttpServletResponse.SC_FORBIDDEN, 
+						message ="User is not the creator, or is a student but results visibility conditions are not met, or is neither")
+	})
 	public Response getResults(
-			@PathParam("id") String surveyId, @QueryParam("userId") String userId) 
+			@ApiParam(value = "Survey id", required = true)
+			@PathParam("id") String surveyId,
+			
+			@ApiParam(value = "Id of user performing request", required = true)
+			@QueryParam("userId") String userId) 
+	
 				throws IOException, ForbiddenException, 
 					SurveyException, ResourceNotFoundException {
 		
