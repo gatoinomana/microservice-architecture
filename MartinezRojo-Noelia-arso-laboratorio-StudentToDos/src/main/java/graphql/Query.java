@@ -10,19 +10,19 @@ import persistence.TaskRepository;
 
 public class Query implements GraphQLRootResolver {
 
-	private final TaskRepository todoRepository;
+	private final TaskRepository taskRepository;
 
-	public Query(TaskRepository todoRepository) {
-		this.todoRepository = todoRepository;
+	public Query(TaskRepository taskRepository) {
+		this.taskRepository = taskRepository;
 	}
 	
-	public List<Task> allTodosStudent(String studentId) {
-		List<Task> theirTodos = new ArrayList<Task>();
+	public List<Task> allTasksStudent(String studentId) {
+		List<Task> theirTasks = new ArrayList<Task>();
 		
-		for (Task todo : todoRepository.getAllTasks())
-			if (todo.getStudentId().equals(studentId))
-				theirTodos.add(todo);
+		for (Task task : taskRepository.getAllTasks())
+			if (task.getStudentId().equals(studentId))
+				theirTasks.add(task);
 		
-		return theirTodos;
+		return theirTasks;
 	}
 }

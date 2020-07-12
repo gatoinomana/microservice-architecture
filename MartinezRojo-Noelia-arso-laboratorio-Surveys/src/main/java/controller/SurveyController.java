@@ -54,7 +54,9 @@ public class SurveyController {
     	usersService = UsersService.getInstance();
 	}
 	
-	public String createSurvey(Survey survey, String userId) throws SurveyException, ForbiddenException, IllegalArgumentException, IOException {
+	public String createSurvey(Survey survey, String userId) 
+			throws SurveyException, ForbiddenException, 
+				IllegalArgumentException, IOException {
 
 		if (!usersService.isTeacher(userId)) {
 			throw new ForbiddenException(
@@ -65,21 +67,7 @@ public class SurveyController {
 			throw new ForbiddenException(
 					"The 'userId' parameter must match the survey's 'creator'");	
 		}
-		
-		// Remove duplicate options
-		List<String> options = survey.getOptions();
-		survey.setOptions(new ArrayList<>(new HashSet<>(options)));
-		
-		if (!isValid(survey)) {
-			throw new IllegalArgumentException(
-					"All the arguments must be valid");
-		}
-		
-		if (survey.getResponses() != null) {
-			throw new IllegalArgumentException(
-					"'responses' cannot be set on creation");
-		}
-		
+
 		boolean duplicated = surveyRepository.getAllSurveys()
 				.stream().filter(other -> other.getCreator().equals(survey.getCreator()) &&
 						other.getEnds().after(new Date()))
@@ -89,11 +77,25 @@ public class SurveyController {
 			throw new ForbiddenException(
 					"The same teacher cannot have two surveys with the same title");
 		}
+		
+		// Remove duplicate options
+		List<String> options = survey.getOptions();
+		survey.setOptions(new ArrayList<>(new HashSet<>(options)));
+		
+		if (survey.getResponses() != null) {
+			throw new IllegalArgumentException(
+					"'responses' cannot be set on creation");
+		}
+		
+		if (!isValid(survey)) {
+			throw new IllegalArgumentException(
+					"All the arguments must be valid");
+		}
 			
 		// Save in database
 		String id = surveyRepository.save(survey).getId();
 		
-		// Publish event (new survey)
+		// Publish event
 		CreateTaskEvent event = new CreateTaskEvent(
 				"New survey", survey.getEnds(), id);
 		
@@ -105,7 +107,7 @@ public class SurveyController {
 		try {
 			jsonString = mapper.writeValueAsString(event);
 		} catch (JsonProcessingException e) {
-			throw new SurveyException("Couldn't serialize survey");
+			throw new SurveyException("Couldn't deserialize survey");
 		} 
 		
 		queueService.publishMessage(jsonString);
@@ -113,7 +115,9 @@ public class SurveyController {
 		return id;
 	}
 	
-	public Survey editSurvey(String surveyId, String userId, JsonPatch jsonPatch) throws SurveyException, ForbiddenException, IOException, ResourceNotFoundException {
+	public Survey editSurvey(String surveyId, String userId, JsonPatch jsonPatch) 
+			throws SurveyException, ForbiddenException, 
+				IOException, ResourceNotFoundException {
 		
 		Survey survey = surveyRepository.getSurvey(surveyId);
 		
@@ -145,7 +149,7 @@ public class SurveyController {
 		try {
 			surveyAsJsonString = mapper.writeValueAsString(survey);
 		} catch (JsonProcessingException e) {
-			throw new SurveyException("Couldn't serialize survey");
+			throw new SurveyException("Couldn't deserialize survey");
 		} 
 		
 		// Then from JSON string to JsonStructure
@@ -183,7 +187,8 @@ public class SurveyController {
 		return patchedSurvey;	
 	}
 	
-	public void removeSurvey(String surveyId, String userId) throws SurveyException, ForbiddenException, ResourceNotFoundException {
+	public void removeSurvey(String surveyId, String userId) 
+			throws SurveyException, ForbiddenException, ResourceNotFoundException {
 		
 		Survey survey = surveyRepository.getSurvey(surveyId);
 		
@@ -206,12 +211,13 @@ public class SurveyController {
 		surveyRepository.remove(surveyId);
 	}
 
-	public List<HiddenResponsesSurveyDTO> getAllSurveys(String userId) throws IOException, ForbiddenException {
+	public List<HiddenResponsesSurveyDTO> getAllSurveys(String userId)
+			throws IOException, ForbiddenException {
 		
 		List<HiddenResponsesSurveyDTO> surveys = 
 				new ArrayList<HiddenResponsesSurveyDTO>();
 		
-		// Teachers can only see their own active or future surveys
+		// Teachers can only see their own surveys
 		if (usersService.isTeacher(userId)) {
 			
 			surveyRepository.getAllSurveys().stream()
@@ -219,7 +225,7 @@ public class SurveyController {
 				.forEach(s -> surveys.add(new HiddenResponsesSurveyDTO(s)));
 		}
 		
-		// Students can see all active or future surveys
+		// Students can see all surveys
 		else if (usersService.isStudent(userId)) {
 			
 			surveyRepository.getAllSurveys().stream().forEach(
@@ -236,7 +242,8 @@ public class SurveyController {
 	}
 	
 
-	public HiddenResponsesSurveyDTO getSurvey(String surveyId, String userId) throws ResourceNotFoundException, ForbiddenException, IOException {
+	public HiddenResponsesSurveyDTO getSurvey(String surveyId, String userId) 
+			throws ResourceNotFoundException, ForbiddenException, IOException {
 		
 		Survey survey = surveyRepository.getSurvey(surveyId);
 		
@@ -254,14 +261,7 @@ public class SurveyController {
 					"Teachers can only see their own surveys");
 			}
 		}
-		else if (usersService.isStudent(userId)) {
-			
-			if (survey.getStarts().after(new Date())) {
-				throw new ForbiddenException(
-					"Students cannot see future surveys");
-			}
-		} 
-		else {
+		else if (!usersService.isStudent(userId)) {
 			
 			throw new ForbiddenException(
 					"Only registered teachers or students can see surveys");
@@ -273,7 +273,7 @@ public class SurveyController {
 	
 	
 	public void fillSurvey(String surveyId, String userId, SurveyResponse response) 
-			throws ForbiddenException, IOException, ResourceNotFoundException {
+			throws ForbiddenException, IOException, ResourceNotFoundException, SurveyException {
 		
 		Survey survey = surveyRepository.getSurvey(surveyId);
 		
@@ -327,12 +327,25 @@ public class SurveyController {
 		// Save to database
 		surveyRepository.saveResponse(surveyId, response);
 		
-		// Publish event (filled survey)
+		// Publish event
+		RemoveTaskEvent event = new RemoveTaskEvent(userId, surveyId);
 		
-
+		ObjectMapper mapper = new ObjectMapper();
+		mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+	    mapper.setDateFormat(new StdDateFormat());
+		String jsonString = "";
+		
+		try {
+			jsonString = mapper.writeValueAsString(event);
+		} catch (JsonProcessingException e) {
+			throw new SurveyException("Couldn't deserialize survey");
+		} 
+		
+		queueService.publishMessage(jsonString);
 	}
 	
-	public Map<String, Double> getResults(String surveyId, String userId) throws IOException, ForbiddenException, ResourceNotFoundException {
+	public Map<String, Double> getResults(String surveyId, String userId) 
+			throws IOException, ForbiddenException, ResourceNotFoundException {
 		
 		Survey survey = surveyRepository.getSurvey(surveyId);
 		

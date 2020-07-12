@@ -1,9 +1,13 @@
-type Todo {
+type Task {
   studentId: String!
+  description: String!
+  deadline: String!
+  id: String!
+  service: String!
 }
 
 type Query {
-  allTodosStudent(studentId: String!): [Todo]
+  allTasksStudent(studentId: String!): [Task]
 }
 
 schema {

@@ -1,5 +1,6 @@
 package graphql;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.URISyntaxException;
@@ -20,9 +21,6 @@ import javax.json.JsonReader;
 import javax.servlet.annotation.WebServlet;
 
 import com.coxautodev.graphql.tools.SchemaParser;
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
 import com.mongodb.client.MongoDatabase;
@@ -75,8 +73,9 @@ public class GraphQLEndpoint extends SimpleGraphQLServlet {
 		}
 		
 		createTasksFromQueue();
-
-		return SchemaParser.newParser().file("schema.graphqls")
+		
+		return SchemaParser.newParser()
+				.file("schema.graphqls")
 		        .resolvers(new Query(taskRepository))
 		        .build().makeExecutableSchema();
 	}
@@ -150,7 +149,7 @@ public class GraphQLEndpoint extends SimpleGraphQLServlet {
 				         * remove their corresponding pending task,
 				         * else create new task for all students
 				         */
-				        boolean newTask = !object.containsKey("StudentId");
+				        boolean newTask = !object.containsKey("studentId");
 				        
 				        if (newTask)
 							try {

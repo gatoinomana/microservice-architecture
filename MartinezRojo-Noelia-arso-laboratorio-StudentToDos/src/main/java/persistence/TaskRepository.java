@@ -52,7 +52,7 @@ public class TaskRepository {
 	
 	public void remove(String studentId, String id, String service) {
 		// Find task
-		tasks.deleteMany(Filters.and(
+		tasks.deleteOne(Filters.and(
 				Filters.eq("studentId", studentId),
 				Filters.eq("id", id), 
 				Filters.eq("service", service)));
