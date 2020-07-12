@@ -242,7 +242,7 @@ namespace MartinezRojo_Noelia_arso_laboratorio_Meetings.Controllers
 
             try
             {
-                attendeeIsStudent = await _usersService.IsStudent(userId);
+                attendeeIsStudent = await _usersService.IsStudent(dto.StudentId);
             }
             catch
             {
@@ -344,6 +344,16 @@ namespace MartinezRojo_Noelia_arso_laboratorio_Meetings.Controllers
             meeting.Intervals[indexOfInterval].Attendees[indexOfSpot] = newBooking;
 
             _meetingsService.Update(id, meeting);
+
+            RemoveTaskEvent _event = new RemoveTaskEvent(
+                dto.StudentId, meeting.Id);
+
+            var options = new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            };
+            string jsonString = JsonSerializer.Serialize(_event, options);
+            _msgQueueService.ProduceMessage(jsonString);
 
             return Ok(meeting);
         }
